@@ -1,14 +1,6 @@
 async function fetchHtmlThroughProxy(url) {
     try {
-        // Replace with your Vercel deployment URL
-        const response = await fetch(`https://cors-proxy-psi-three.vercel.app/${encodeURIComponent(url)}`);
-        
-        // Check if the response was successful
-        if (!response.ok) {
-            throw new Error(`Failed to fetch HTML: ${response.statusText}`);
-        }
-
-        // Return the fetched HTML content
+        const response = await fetch(`https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(url)}`);
         return await response.text();
     } catch (error) {
         alert("Failed to fetch HTML through proxy: " + error.message);
