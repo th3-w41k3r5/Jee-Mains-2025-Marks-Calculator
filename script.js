@@ -1,3 +1,9 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const initialModal = new bootstrap.Modal(document.getElementById("initialModal"));
+    initialModal.show();
+});
+
+
 async function fetchHtmlThroughProxy(url) {
     try {
         const response = await fetch(`https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(url)}`);
@@ -134,34 +140,54 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const fileInput = document.getElementById("answerSheetFile");
+    const resultsSection = document.getElementById("resultsSection");
+    const loadingSpinner = document.getElementById("loadingSpinner");
     let htmlContent = "";
 
-    if (fileInput.files.length) {
-        const file = fileInput.files[0];
-        htmlContent = await file.text();
-    } else if (urlInput) {
-        htmlContent = await fetchHtmlThroughProxy(urlInput);
-    } else {
-        alert("Please provide a file or URL.");
-        return;
+    // Show the spinner and hide the results section
+    loadingSpinner.classList.remove("d-none");
+    resultsSection.classList.add("d-none");
+
+    try {
+        if (fileInput.files.length) {
+            const file = fileInput.files[0];
+            htmlContent = await file.text();
+        } else if (urlInput) {
+            htmlContent = await fetchHtmlThroughProxy(urlInput);
+        } else {
+            alert("Please provide a file or URL.");
+            return;
+        }
+
+        if (!htmlContent) {
+            alert("Failed to fetch or upload HTML content.");
+            return;
+        }
+
+        await fetchAnswerKeys();
+
+        if (typeof answerKeys === "undefined") {
+            alert("Answer keys could not be loaded. Please check your anskey.js file.");
+            return;
+        }
+
+        const userAnswers = parseAnswerSheetHTML(htmlContent);
+        const evaluationResult = evaluateAnswers(
+            userAnswers.questions,
+            answerKeys[document.getElementById("examDate").value]
+        );
+
+        displayResults(evaluationResult);
+    } catch (error) {
+        alert("An error occurred. Please try again.");
+    } finally {
+        // Hide the spinner and show results section
+        loadingSpinner.classList.add("d-none");
+        resultsSection.classList.remove("d-none");
     }
-
-    if (!htmlContent) {
-        alert("Failed to fetch or upload HTML content.");
-        return;
-    }
-
-    await fetchAnswerKeys();
-
-    if (typeof answerKeys === 'undefined') {
-        alert("Answer keys could not be loaded. Please check your anskey.js file.");
-        return;
-    }
-
-    const userAnswers = parseAnswerSheetHTML(htmlContent);
-    const evaluationResult = evaluateAnswers(userAnswers.questions, answerKeys[document.getElementById("examDate").value]);
-    displayResults(evaluationResult);
 });
+
+
 
 
 function evaluateAnswers(userAnswers, answerKey) {
@@ -304,6 +330,26 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
     // Make the results section visible
     document.getElementById("resultsSection").classList.remove("d-none");
 }
+
+document.getElementById("toggleIncorrect").addEventListener("click", function () {
+    const button = this;
+    const resultsTable = document.getElementById("resultsTable");
+    const rows = resultsTable.querySelectorAll("tr");
+
+    if (button.textContent === "Show Only Incorrect Questions") {
+        rows.forEach(row => {
+            if (!row.classList.contains("table-danger")) {
+                row.style.display = "none";
+            }
+        });
+        button.textContent = "Show All Questions";
+    } else {
+        rows.forEach(row => {
+            row.style.display = "";
+        });
+        button.textContent = "Show Only Incorrect Questions";
+    }
+});
 
 
 function getSubjectFromQuestionId(questionId, subject) {

@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Answer Sheet Evaluation</title>
+    <title>JEE 2025 Scorecard </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
     <style>
         body {
             background-color: #121212;
@@ -22,11 +24,64 @@
         .table-danger {
             background-color: #b71c1c !important;
         }
+        #toggleIncorrect {
+            color: #e0e0e0;
+            background-color: #333333;
+            border: 1px solid #555555;
+        }
+
+        #toggleIncorrect:hover {
+            background-color: #444444;
+            color: #ffffff;
+        }
+        #loadingSpinner {
+            display: flex; /* Flexbox for centering */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #loadingSpinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        } 
     </style>
 </head>
 <body>
+    <div class="modal fade" id="initialModal" tabindex="-1" aria-labelledby="initialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title" id="initialModalLabel" style="font-weight: bold; font-size: 1.5rem;">Points to Be Noted</h5>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">1.</span> <b>Don't take these scores too seriously</b>. It's NTA—they often make errors in the answer key, and this code contains bugs that need to be fixed when identified.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">2.</span> Although you can upload an HTML file, I recommend <b>putting the direct link</b> to your response sheet (starting with <code>cdn3.digialm.com</code>) to fetch score data efficiently.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">3.</span> If you discover impossible score data:
+                    </p>
+                    <ul>
+                        <li>Check if you have selected the correct date for the corresponding response sheet.</li>
+                        <li>DM me on Reddit (<code>u/Novadrone16</code>) with your issue.</li>
+                    </ul>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">4.</span> You can <b>click on small question images</b> to view the complete image.
+                    </p>
+                    <p class="text-center mt-3" style="font-size: 0.9rem; color: #aaa;">
+                        <a href="https://github.com" target="_blank" class="text-primary" style="text-decoration: none;">(Source Code)</a>
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-5" data-bs-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Answer Sheet Evaluation</h1>
+        <h1 class="text-center mb-4">JEE 2025 Scorecard</h1>
 
         <form id="evaluationForm" class="mb-4">
             <div class="mb-3">
@@ -50,9 +105,35 @@
             <button type="submit" class="btn btn-primary w-100">Evaluate</button>
         </form>
 
+        <div class="modal fade" id="dateMismatchModal" tabindex="-1" aria-labelledby="dateMismatchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateMismatchModalLabel">Date Mismatch</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Please choose the correct date for the corresponding response sheet.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="resultsSection" class="d-none">
+            <div id="loadingSpinner" class="text-center d-none my-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Fetching data, please wait...</p>
+            </div>
             <div id="resultsSummary" class="mb-4"></div>
-            <h3 class="mb-3">Detailed Question Evaluation</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">Detailed Question Evaluation</h3>
+                <button id="toggleIncorrect" class="btn btn-dark btn-sm border-light">Show Only Incorrect Questions</button>
+            </div>
             <table class="table table-bordered table-dark">
                 <thead>
                     <tr>
@@ -70,6 +151,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
