@@ -8,39 +8,18 @@ async function fetchHtmlThroughProxy(url) {
     }
 }
 
+
 async function fetchAnswerKeys() {
     try {
-        // Check if answerKeys is already defined to avoid duplicate injection
-        if (typeof answerKeys !== 'undefined') {
-            console.log("Answer keys already loaded.");
-            return;
-        }
-
         const response = await fetch('./anskey.js');
         if (!response.ok) {
             throw new Error('Failed to load answer keys');
         }
-
         const text = await response.text();
         const keysScript = document.createElement('script');
         keysScript.type = 'text/javascript';
         keysScript.text = text;
         document.head.appendChild(keysScript);
-
-        // Wait until answerKeys is defined
-        await new Promise((resolve, reject) => {
-            const interval = setInterval(() => {
-                if (typeof answerKeys !== 'undefined') {
-                    clearInterval(interval);
-                    resolve();
-                }
-            }, 100);
-            setTimeout(() => {
-                clearInterval(interval);
-                reject(new Error("Timeout loading answer keys"));
-            }, 5000);
-        });
-
     } catch (error) {
         console.error("Error fetching answer keys:", error);
         alert("Failed to fetch answer keys: " + error.message);
@@ -57,12 +36,12 @@ function parseAnswerSheetHTML(htmlContent) {
     const generalInfoRows = generalInfoTable ? generalInfoTable.querySelectorAll('tr') : [];
 
     const generalInfo = generalInfoRows.length >= 6 ? {
-        application_no: generalInfoRows[0].querySelectorAll('td')[1].textContent.trim(),
-        candidate_name: generalInfoRows[1].querySelectorAll('td')[1].textContent.trim(),
-        roll_no: generalInfoRows[2].querySelectorAll('td')[1].textContent.trim(),
-        test_date: generalInfoRows[3].querySelectorAll('td')[1].textContent.trim(),
-        test_time: generalInfoRows[4].querySelectorAll('td')[1].textContent.trim(),
-        subject: generalInfoRows[5].querySelectorAll('td')[1].textContent.trim(),
+        application_no: generalInfoRows[0].querySelectorAll('td')[1]?.textContent.trim(),
+        candidate_name: generalInfoRows[1].querySelectorAll('td')[1]?.textContent.trim(),
+        roll_no: generalInfoRows[2].querySelectorAll('td')[1]?.textContent.trim(),
+        test_date: generalInfoRows[3].querySelectorAll('td')[1]?.textContent.trim(),
+        test_time: generalInfoRows[4].querySelectorAll('td')[1]?.textContent.trim(),
+        subject: generalInfoRows[5].querySelectorAll('td')[1]?.textContent.trim(),
     } : {};
 
     // Extract question details
@@ -70,40 +49,55 @@ function parseAnswerSheetHTML(htmlContent) {
     const questionPanels = doc.querySelectorAll('.question-pnl');
 
     questionPanels.forEach(panel => {
-        // Question image
+        // Extract question image
         const questionImgTag = panel.querySelector('td.bold[valign="top"] img');
-        const questionImg = questionImgTag ? questionImgTag.getAttribute('src') : null;
+        const questionImg = questionImgTag ? new URL(questionImgTag.getAttribute('src'), 'https://cdn3.digialm.com').href : null;
 
-        // Question ID and Options
+        // Extract question ID and option details
         const menuTable = panel.querySelector('table.menu-tbl');
         const menuRows = menuTable ? menuTable.querySelectorAll('tr') : [];
-        const questionId = menuRows.length > 1 ? menuRows[1].querySelectorAll('td')[1].textContent.trim() : null;
+        const questionId = menuRows.length > 1 ? menuRows[1].querySelectorAll('td')[1]?.textContent.trim() : null;
 
-        // Integer-based question handling
-        const questionType = menuRows.length > 0 ? menuRows[0].querySelectorAll('td')[1].textContent.trim() : null;
+        // Check for integer-based questions or multiple-choice questions
+        const questionType = menuRows.length > 0 ? menuRows[0].querySelectorAll('td')[1]?.textContent.trim() : null;
         let givenAnswer = null;
 
-        if (questionType === "SA") {
+        // Extract options and their IDs (for MCQs)
+        const optionIds = {};
+        const optionImages = {};
+
+        if (questionType === "MCQ") {
+            const optionRows = panel.querySelectorAll('td');
+            optionRows.forEach(row => {
+                const textContent = row.textContent.trim();
+                if (textContent.startsWith("1.") || textContent.startsWith("2.") || textContent.startsWith("3.") || textContent.startsWith("4.")) {
+                    const optionNumber = textContent[0]; // Extract the option number (e.g., "1", "2", etc.)
+                    const imgTag = row.querySelector('img');
+                    const optionImg = imgTag ? new URL(imgTag.getAttribute('src'), 'https://cdn3.digialm.com').href : null;
+                    const optionId = menuRows.length >= 6 ? menuRows[parseInt(optionNumber) + 1]?.querySelectorAll('td')[1]?.textContent.trim() : null;
+
+                    if (optionId) {
+                        optionIds[optionNumber] = optionId; // Map option number to ID
+                        optionImages[optionId] = optionImg; // Map option ID to its image
+                    }
+                }
+            });
+
+            // Extract chosen option and resolve it to the correct option ID
+            const chosenOptionNumber = menuRows.length > 7 ? menuRows[7].querySelectorAll('td')[1]?.textContent.trim() : null;
+            givenAnswer = chosenOptionNumber && optionIds[chosenOptionNumber] ? optionIds[chosenOptionNumber] : "No Answer";
+        } else if (questionType === "SA") {
             const givenAnswerElement = panel.querySelector('td.bold[style="word-break: break-word;"]');
             givenAnswer = givenAnswerElement ? givenAnswerElement.textContent.trim() : "No Answer";
-        } else {
-            // Option-based question handling
-            const optionIds = menuRows.length >= 6 ? {
-                "1": menuRows[2].querySelectorAll('td')[1].textContent.trim(),
-                "2": menuRows[3].querySelectorAll('td')[1].textContent.trim(),
-                "3": menuRows[4].querySelectorAll('td')[1].textContent.trim(),
-                "4": menuRows[5].querySelectorAll('td')[1].textContent.trim(),
-            } : {};
-
-            const chosenOptionNumber = menuRows.length > 7 ? menuRows[7].querySelectorAll('td')[1].textContent.trim() : null;
-            givenAnswer = chosenOptionNumber && optionIds[chosenOptionNumber] ? optionIds[chosenOptionNumber] : "No Answer";
         }
 
-        // Append question data
+        // Append question data to results
         if (questionId) {
             questions.push({
                 question_id: questionId,
                 question_img: questionImg,
+                options: optionIds,
+                option_images: optionImages,
                 given_answer: givenAnswer,
                 question_type: questionType
             });
@@ -116,6 +110,7 @@ function parseAnswerSheetHTML(htmlContent) {
         questions: questions
     };
 }
+
 
 document.getElementById("evaluationForm").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -161,16 +156,22 @@ function evaluateAnswers(userAnswers, answerKey) {
         maths: { attempted: 0, correct: 0, incorrect: 0 }
     };
 
-    for (const [questionId, correctAnswer] of Object.entries(answerKey)) {
-        const userAnswer = userAnswers.find(q => q.question_id === questionId)?.given_answer || "No Answer";
+    for (const [questionId, correctAnswerId] of Object.entries(answerKey)) {
+        // Find the question details in userAnswers
+        const userAnswerDetails = userAnswers.find(q => q.question_id === questionId);
+        const userAnswerId = userAnswerDetails?.given_answer || "No Answer";
+        const userAnswerImg = userAnswerDetails?.option_images[userAnswerId] || null;
+        const correctAnswerImg = userAnswerDetails?.option_images[correctAnswerId] || null;
+        const questionImg = userAnswerDetails?.question_img || null;
+
         let status = "Unattempted";
         const subject = getSubjectFromQuestionId(questionId); // Assumes a function mapping question ID to subject exists
 
-        if (userAnswer !== "No Answer") {
+        if (userAnswerId !== "No Answer") {
             attemptedCount++;
             subjectStats[subject].attempted++;
 
-            if (userAnswer === correctAnswer) {
+            if (userAnswerId === correctAnswerId) {
                 correctCount++;
                 subjectStats[subject].correct++;
                 status = "Correct";
@@ -181,19 +182,38 @@ function evaluateAnswers(userAnswers, answerKey) {
             }
         }
 
-        results.push({ questionId, userAnswer, correctAnswer, status });
+        // Push detailed result
+        results.push({
+            questionId,
+            questionImg,
+            userAnswerId,
+            userAnswerImg,
+            correctAnswerId,
+            correctAnswerImg,
+            status
+        });
     }
 
-    const totalScore = correctCount * 4 - incorrectCount * 1;
-    return { results, correctCount, incorrectCount, attemptedCount, totalQuestions: Object.keys(answerKey).length, totalScore, subjectStats };
+    const totalScore = correctCount * 4 - incorrectCount * 1; // Scoring: +4 for correct, -1 for incorrect
+    return {
+        results,
+        correctCount,
+        incorrectCount,
+        attemptedCount,
+        totalQuestions: Object.keys(answerKey).length,
+        totalScore,
+        subjectStats
+    };
 }
+
 
 function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
     const resultsTable = document.getElementById("resultsTable");
     const summarySection = document.getElementById("resultsSummary");
 
+    // Update the summary section with overall stats and subject-wise breakdown
     summarySection.innerHTML = `
-        <h3>Your Score</h3>
+        <h3>Your Score: ${totalScore}</h3>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -237,23 +257,26 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
         </table>
     `;
 
+    // Clear previous table content
     resultsTable.innerHTML = "";
-    results.forEach(({ questionId, userAnswer, correctAnswer, status }) => {
-        const row = `<tr class="${status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : ''}">
-            <td>${questionId}</td>
-            <td>${userAnswer}</td>
-            <td>${correctAnswer}</td>
-            <td>${status}</td>
-        </tr>`;
+
+    // Populate the detailed question evaluation table
+    results.forEach(({ questionId, questionImg, correctAnswerId, correctAnswerImg, userAnswerId, userAnswerImg, status }) => {
+        const questionImgHTML = questionImg ? `<img src="${questionImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${questionImg}', '_blank');">` : '';
+        const correctImgHTML = correctAnswerImg ? `<img src="${correctAnswerImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${correctAnswerImg}', '_blank');">` : '';
+        const userImgHTML = userAnswerImg ? `<img src="${userAnswerImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${userAnswerImg}', '_blank');">` : '';
+
+        const row = `
+            <tr class="${status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : ''}">
+                <td>${questionId}<br>${questionImgHTML}</td>
+                <td>${userAnswerId || ''}<br>${userImgHTML}</td>
+                <td>${correctAnswerId || ''}<br>${correctImgHTML}</td>
+                <td>${status}</td>
+            </tr>`;
         resultsTable.innerHTML += row;
     });
 
+    // Make the results section visible
     document.getElementById("resultsSection").classList.remove("d-none");
 }
 
-function getSubjectFromQuestionId(questionId) {
-    // Dummy implementation for mapping question IDs to subjects
-    if (questionId.startsWith("1")) return "physics";
-    if (questionId.startsWith("2")) return "chemistry";
-    return "maths";
-}
