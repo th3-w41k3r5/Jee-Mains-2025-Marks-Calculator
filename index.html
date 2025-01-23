@@ -10,7 +10,7 @@
             background-color: #121212;
             color: #e0e0e0;
         }
-        .form-label, .btn, .table, h1, h2, p {
+        .form-label, .btn, .table, h1, h2, h3, p {
             color: #e0e0e0;
         }
         .table-dark {
@@ -26,15 +26,14 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Response Sheet Evaluation</h1>
+        <h1 class="text-center mb-4">Answer Sheet Evaluation</h1>
 
         <form id="evaluationForm" class="mb-4">
             <div class="mb-3">
                 <label for="examDate" class="form-label">Select Exam Date:</label>
                 <select id="examDate" class="form-select bg-dark text-light">
-                    <option value="2024-01-27-shift-1">27th Jan, Shift 1</option>
-                    <option value="2024-01-29-shift-2">29th Jan, Shift 2</option>
-                    <option value="2024-04-09-shift-2">9th April, Shift 2</option>
+                    <option value="2025-01-27-shift-1">27th Jan, Shift 1</option>
+                    <!-- Add more dates/shifts as needed -->
                 </select>
             </div>
 
@@ -52,7 +51,8 @@
         </form>
 
         <div id="resultsSection" class="d-none">
-            <h2 class="mb-4">Evaluation Results</h2>
+            <div id="resultsSummary" class="mb-4"></div>
+            <h3 class="mb-3">Detailed Question Evaluation</h3>
             <table class="table table-bordered table-dark">
                 <thead>
                     <tr>
@@ -64,14 +64,6 @@
                 </thead>
                 <tbody id="resultsTable"></tbody>
             </table>
-
-            <div class="mt-4">
-                <p><strong>Total Questions:</strong> <span id="totalQuestions"></span></p>
-                <p><strong>Attempted:</strong> <span id="attemptedQuestions"></span></p>
-                <p><strong>Correct:</strong> <span id="correctQuestions"></span></p>
-                <p><strong>Incorrect:</strong> <span id="incorrectQuestions"></span></p>
-                <p><strong>Score:</strong> <span id="totalScore"></span></p>
-            </div>
         </div>
     </div>
 

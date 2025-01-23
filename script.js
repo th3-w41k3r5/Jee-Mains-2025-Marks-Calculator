@@ -10,20 +10,43 @@ async function fetchHtmlThroughProxy(url) {
 
 async function fetchAnswerKeys() {
     try {
+        // Check if answerKeys is already defined to avoid duplicate injection
+        if (typeof answerKeys !== 'undefined') {
+            console.log("Answer keys already loaded.");
+            return;
+        }
+
         const response = await fetch('./anskey.js');
         if (!response.ok) {
             throw new Error('Failed to load answer keys');
         }
+
         const text = await response.text();
         const keysScript = document.createElement('script');
         keysScript.type = 'text/javascript';
         keysScript.text = text;
         document.head.appendChild(keysScript);
+
+        // Wait until answerKeys is defined
+        await new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+                if (typeof answerKeys !== 'undefined') {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+            setTimeout(() => {
+                clearInterval(interval);
+                reject(new Error("Timeout loading answer keys"));
+            }, 5000);
+        });
+
     } catch (error) {
         console.error("Error fetching answer keys:", error);
         alert("Failed to fetch answer keys: " + error.message);
     }
 }
+
 
 function parseAnswerSheetHTML(htmlContent) {
     const parser = new DOMParser();
@@ -128,21 +151,32 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     displayResults(evaluationResult);
 });
 
+
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
     let correctCount = 0, incorrectCount = 0, attemptedCount = 0;
+    const subjectStats = {
+        physics: { attempted: 0, correct: 0, incorrect: 0 },
+        chemistry: { attempted: 0, correct: 0, incorrect: 0 },
+        maths: { attempted: 0, correct: 0, incorrect: 0 }
+    };
 
     for (const [questionId, correctAnswer] of Object.entries(answerKey)) {
         const userAnswer = userAnswers.find(q => q.question_id === questionId)?.given_answer || "No Answer";
         let status = "Unattempted";
+        const subject = getSubjectFromQuestionId(questionId); // Assumes a function mapping question ID to subject exists
 
         if (userAnswer !== "No Answer") {
             attemptedCount++;
+            subjectStats[subject].attempted++;
+
             if (userAnswer === correctAnswer) {
                 correctCount++;
+                subjectStats[subject].correct++;
                 status = "Correct";
             } else {
                 incorrectCount++;
+                subjectStats[subject].incorrect++;
                 status = "Incorrect";
             }
         }
@@ -151,16 +185,57 @@ function evaluateAnswers(userAnswers, answerKey) {
     }
 
     const totalScore = correctCount * 4 - incorrectCount * 1;
-    return { results, correctCount, incorrectCount, attemptedCount, totalQuestions: Object.keys(answerKey).length, totalScore };
+    return { results, correctCount, incorrectCount, attemptedCount, totalQuestions: Object.keys(answerKey).length, totalScore, subjectStats };
 }
 
-function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore }) {
+function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
     const resultsTable = document.getElementById("resultsTable");
-    const totalQuestionsEl = document.getElementById("totalQuestions");
-    const attemptedQuestionsEl = document.getElementById("attemptedQuestions");
-    const correctQuestionsEl = document.getElementById("correctQuestions");
-    const incorrectQuestionsEl = document.getElementById("incorrectQuestions");
-    const totalScoreEl = document.getElementById("totalScore");
+    const summarySection = document.getElementById("resultsSummary");
+
+    summarySection.innerHTML = `
+        <h3>Your Score</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Total</th>
+                    <th>Physics</th>
+                    <th>Chemistry</th>
+                    <th>Maths</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Attempted</td>
+                    <td>${attemptedCount}</td>
+                    <td>${subjectStats.physics.attempted}</td>
+                    <td>${subjectStats.chemistry.attempted}</td>
+                    <td>${subjectStats.maths.attempted}</td>
+                </tr>
+                <tr>
+                    <td>Correct</td>
+                    <td>${correctCount}</td>
+                    <td>${subjectStats.physics.correct}</td>
+                    <td>${subjectStats.chemistry.correct}</td>
+                    <td>${subjectStats.maths.correct}</td>
+                </tr>
+                <tr>
+                    <td>Incorrect</td>
+                    <td>${incorrectCount}</td>
+                    <td>${subjectStats.physics.incorrect}</td>
+                    <td>${subjectStats.chemistry.incorrect}</td>
+                    <td>${subjectStats.maths.incorrect}</td>
+                </tr>
+                <tr>
+                    <td>Score</td>
+                    <td>${totalScore}</td>
+                    <td>${subjectStats.physics.correct * 4 - subjectStats.physics.incorrect}</td>
+                    <td>${subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect}</td>
+                    <td>${subjectStats.maths.correct * 4 - subjectStats.maths.incorrect}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
 
     resultsTable.innerHTML = "";
     results.forEach(({ questionId, userAnswer, correctAnswer, status }) => {
@@ -173,11 +248,12 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
         resultsTable.innerHTML += row;
     });
 
-    totalQuestionsEl.textContent = totalQuestions;
-    attemptedQuestionsEl.textContent = attemptedCount;
-    correctQuestionsEl.textContent = correctCount;
-    incorrectQuestionsEl.textContent = incorrectCount;
-    totalScoreEl.textContent = totalScore;
-
     document.getElementById("resultsSection").classList.remove("d-none");
+}
+
+function getSubjectFromQuestionId(questionId) {
+    // Dummy implementation for mapping question IDs to subjects
+    if (questionId.startsWith("1")) return "physics";
+    if (questionId.startsWith("2")) return "chemistry";
+    return "maths";
 }
