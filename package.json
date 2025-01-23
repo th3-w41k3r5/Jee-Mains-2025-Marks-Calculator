@@ -14,7 +14,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "node-fetch": "^2.7.0",
-    "netlify-cli": "^3.0.0"
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^3.39.4"
   }
 }
