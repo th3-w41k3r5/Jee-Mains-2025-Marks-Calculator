@@ -1,27 +1,24 @@
-// netlify/functions/fetchHtml.js
+import fetch from 'node-fetch';
 
-const fetch = require("node-fetch");
+export async function handler(event, context) {
+    const url = event.queryStringParameters.url;
 
-exports.handler = async (event, context) => {
-  const url = event.queryStringParameters.url;
-  if (!url) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "URL is required" }),
-    };
-  }
+    try {
+        const response = await fetch(url);
+        const html = await response.text();
 
-  try {
-    const response = await fetch(url);
-    const html = await response.text();
-    return {
-      statusCode: 200,
-      body: html,
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Error fetching HTML: " + error.message }),
-    };
-  }
-};
+        return {
+            statusCode: 200,
+            body: html,
+            headers: {
+                'Content-Type': 'text/html',
+                'Access-Control-Allow-Origin': '*'
+            }
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: `Failed to fetch HTML: ${error.message}`
+        };
+    }
+}
