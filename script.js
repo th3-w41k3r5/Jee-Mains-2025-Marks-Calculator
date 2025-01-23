@@ -280,3 +280,10 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
     document.getElementById("resultsSection").classList.remove("d-none");
 }
 
+
+function getSubjectFromQuestionId(questionId) {
+    // Dummy implementation for mapping question IDs to subjects
+    if (questionId.startsWith("1")) return "physics";
+    if (questionId.startsWith("2")) return "chemistry";
+    return "maths";
+}
