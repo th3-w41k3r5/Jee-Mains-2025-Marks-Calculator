@@ -1,12 +1,21 @@
 async function fetchHtmlThroughProxy(url) {
     try {
-        const response = await fetch(`http://localhost:3000/fetch-html?url=${encodeURIComponent(url)}`);
+        // Replace localhost with the Netlify function URL
+        const response = await fetch(`https://j2025anscheck.netlify.app/.netlify/functions/fetchHtml?url=${encodeURIComponent(url)}`);
+        
+        // Check if the response was successful
+        if (!response.ok) {
+            throw new Error(`Failed to fetch HTML: ${response.statusText}`);
+        }
+
+        // Return the fetched HTML content
         return await response.text();
     } catch (error) {
         alert("Failed to fetch HTML through proxy: " + error.message);
         return null;
     }
 }
+
 
 const answerKeys = {
     "2025-01-27-shift-1": {
