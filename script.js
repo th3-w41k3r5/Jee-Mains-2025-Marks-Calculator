@@ -1,7 +1,7 @@
 async function fetchHtmlThroughProxy(url) {
     try {
-        // Replace localhost with the Netlify function URL
-        const response = await fetch(`/.netlify/functions/fetchHtml?url=${encodeURIComponent(url)}`);
+        // Replace with your Vercel deployment URL
+        const response = await fetch(`https://cors-proxy-psi-three.vercel.app/${encodeURIComponent(url)}`);
         
         // Check if the response was successful
         if (!response.ok) {
