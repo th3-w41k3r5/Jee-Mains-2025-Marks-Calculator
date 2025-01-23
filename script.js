@@ -36,12 +36,12 @@ function parseAnswerSheetHTML(htmlContent) {
     const generalInfoRows = generalInfoTable ? generalInfoTable.querySelectorAll('tr') : [];
 
     const generalInfo = generalInfoRows.length >= 6 ? {
-        application_no: generalInfoRows[0].querySelectorAll('td')[1]?.textContent.trim(),
-        candidate_name: generalInfoRows[1].querySelectorAll('td')[1]?.textContent.trim(),
-        roll_no: generalInfoRows[2].querySelectorAll('td')[1]?.textContent.trim(),
-        test_date: generalInfoRows[3].querySelectorAll('td')[1]?.textContent.trim(),
-        test_time: generalInfoRows[4].querySelectorAll('td')[1]?.textContent.trim(),
-        subject: generalInfoRows[5].querySelectorAll('td')[1]?.textContent.trim(),
+        application_no: generalInfoRows[0]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        candidate_name: generalInfoRows[1]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        roll_no: generalInfoRows[2]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        test_date: generalInfoRows[3]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        test_time: generalInfoRows[4]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
+        subject: generalInfoRows[5]?.querySelectorAll('td')[1]?.textContent.trim() || "N/A",
     } : {};
 
     // Extract question details
@@ -49,6 +49,19 @@ function parseAnswerSheetHTML(htmlContent) {
     const questionPanels = doc.querySelectorAll('.question-pnl');
 
     questionPanels.forEach(panel => {
+        // Extract the subject from the nearest .section-cntnr
+        const sectionContainer = panel.closest('.section-cntnr');
+        const sectionLabel = sectionContainer?.querySelector('.section-lbl .bold')?.textContent.trim();
+
+        let subject = "unknown";
+        if (sectionLabel?.includes("Mathematics")) {
+            subject = "maths";
+        } else if (sectionLabel?.includes("Physics")) {
+            subject = "physics";
+        } else if (sectionLabel?.includes("Chemistry")) {
+            subject = "chemistry";
+        }
+
         // Extract question image
         const questionImgTag = panel.querySelector('td.bold[valign="top"] img');
         const questionImg = questionImgTag ? new URL(questionImgTag.getAttribute('src'), 'https://cdn3.digialm.com').href : null;
@@ -56,10 +69,13 @@ function parseAnswerSheetHTML(htmlContent) {
         // Extract question ID and option details
         const menuTable = panel.querySelector('table.menu-tbl');
         const menuRows = menuTable ? menuTable.querySelectorAll('tr') : [];
-        const questionId = menuRows.length > 1 ? menuRows[1].querySelectorAll('td')[1]?.textContent.trim() : null;
+        const questionId = menuRows.length > 1 ? menuRows[1]?.querySelectorAll('td')[1]?.textContent.trim() : null;
+
+        // Skip this panel if questionId is not found
+        if (!questionId) return;
 
         // Check for integer-based questions or multiple-choice questions
-        const questionType = menuRows.length > 0 ? menuRows[0].querySelectorAll('td')[1]?.textContent.trim() : null;
+        const questionType = menuRows.length > 0 ? menuRows[0]?.querySelectorAll('td')[1]?.textContent.trim() : null;
         let givenAnswer = null;
 
         // Extract options and their IDs (for MCQs)
@@ -84,7 +100,7 @@ function parseAnswerSheetHTML(htmlContent) {
             });
 
             // Extract chosen option and resolve it to the correct option ID
-            const chosenOptionNumber = menuRows.length > 7 ? menuRows[7].querySelectorAll('td')[1]?.textContent.trim() : null;
+            const chosenOptionNumber = menuRows.length > 7 ? menuRows[7]?.querySelectorAll('td')[1]?.textContent.trim() : null;
             givenAnswer = chosenOptionNumber && optionIds[chosenOptionNumber] ? optionIds[chosenOptionNumber] : "No Answer";
         } else if (questionType === "SA") {
             const givenAnswerElement = panel.querySelector('td.bold[style="word-break: break-word;"]');
@@ -92,16 +108,15 @@ function parseAnswerSheetHTML(htmlContent) {
         }
 
         // Append question data to results
-        if (questionId) {
-            questions.push({
-                question_id: questionId,
-                question_img: questionImg,
-                options: optionIds,
-                option_images: optionImages,
-                given_answer: givenAnswer,
-                question_type: questionType
-            });
-        }
+        questions.push({
+            question_id: questionId,
+            question_img: questionImg,
+            options: optionIds,
+            option_images: optionImages,
+            given_answer: givenAnswer,
+            question_type: questionType,
+            subject // Include the subject in the question data
+        });
     });
 
     // Return extracted data
@@ -110,6 +125,8 @@ function parseAnswerSheetHTML(htmlContent) {
         questions: questions
     };
 }
+
+
 
 
 document.getElementById("evaluationForm").addEventListener("submit", async function (e) {
@@ -150,6 +167,8 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
     let correctCount = 0, incorrectCount = 0, attemptedCount = 0;
+
+    // Initialize stats for each subject
     const subjectStats = {
         physics: { attempted: 0, correct: 0, incorrect: 0 },
         chemistry: { attempted: 0, correct: 0, incorrect: 0 },
@@ -165,7 +184,12 @@ function evaluateAnswers(userAnswers, answerKey) {
         const questionImg = userAnswerDetails?.question_img || null;
 
         let status = "Unattempted";
-        const subject = getSubjectFromQuestionId(questionId); // Assumes a function mapping question ID to subject exists
+        const subject = userAnswerDetails?.subject || "unknown";
+
+        // Ensure the subject exists in subjectStats
+        if (!subjectStats[subject]) {
+            subjectStats[subject] = { attempted: 0, correct: 0, incorrect: 0 };
+        }
 
         if (userAnswerId !== "No Answer") {
             attemptedCount++;
@@ -205,6 +229,7 @@ function evaluateAnswers(userAnswers, answerKey) {
         subjectStats
     };
 }
+
 
 
 function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
@@ -281,9 +306,7 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
 }
 
 
-function getSubjectFromQuestionId(questionId) {
-    // Dummy implementation for mapping question IDs to subjects
-    if (questionId.startsWith("1")) return "physics";
-    if (questionId.startsWith("2")) return "chemistry";
-    return "maths";
+function getSubjectFromQuestionId(questionId, subject) {
+    return subject; // Use the subject parsed from HTML
 }
+
