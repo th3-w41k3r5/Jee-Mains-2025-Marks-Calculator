@@ -179,6 +179,16 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             answerKeys[document.getElementById("examDate").value]
         );
 
+        const uniqueId = generateUniqueId();
+        const examDate = document.getElementById("examDate").value;
+
+        storeEvaluationData(
+            uniqueId,
+            examDate,
+            evaluationResult.subjectStats,
+            evaluationResult.totalScore
+        );
+
         displayResults(evaluationResult);
     } catch (error) {
         alert("An error occurred. Please try again.");
@@ -192,12 +202,12 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
-    let correctCount = 0, incorrectCount = 0, attemptedCount = 0;
+    let correctCount = 0, incorrectCount = 0, attemptedCount = 0, droppedCount = 0;
 
     const subjectStats = {
-        physics: { attempted: 0, correct: 0, incorrect: 0 },
-        chemistry: { attempted: 0, correct: 0, incorrect: 0 },
-        maths: { attempted: 0, correct: 0, incorrect: 0 }
+        physics: { attempted: 0, correct: 0, incorrect: 0, dropped: 0 },
+        chemistry: { attempted: 0, correct: 0, incorrect: 0, dropped: 0 },
+        maths: { attempted: 0, correct: 0, incorrect: 0, dropped: 0 }
     };
 
     for (const [questionId, correctAnswerId] of Object.entries(answerKey)) {
@@ -211,10 +221,14 @@ function evaluateAnswers(userAnswers, answerKey) {
         const subject = userAnswerDetails?.subject || "unknown";
 
         if (!subjectStats[subject]) {
-            subjectStats[subject] = { attempted: 0, correct: 0, incorrect: 0 };
+            subjectStats[subject] = { attempted: 0, correct: 0, incorrect: 0, dropped: 0 };
         }
 
-        if (userAnswerId !== "No Answer") {
+        if (correctAnswerId === "DROP") {
+            droppedCount++;
+            subjectStats[subject].dropped++;
+            status = "Dropped";
+        } else if (userAnswerId !== "No Answer") {
             attemptedCount++;
             subjectStats[subject].attempted++;
 
@@ -240,11 +254,13 @@ function evaluateAnswers(userAnswers, answerKey) {
         });
     }
 
-    const totalScore = correctCount * 4 - incorrectCount * 1;
+    const totalScore = (correctCount * 4) - (incorrectCount * 1) + (droppedCount * 4);
+
     return {
         results,
         correctCount,
         incorrectCount,
+        droppedCount,
         attemptedCount,
         totalQuestions: Object.keys(answerKey).length,
         totalScore,
@@ -253,7 +269,7 @@ function evaluateAnswers(userAnswers, answerKey) {
 }
 
 
-function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
+function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
     const resultsTable = document.getElementById("resultsTable");
     const summarySection = document.getElementById("resultsSummary");
 
@@ -292,11 +308,18 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
                     <td>${subjectStats.maths.incorrect}</td>
                 </tr>
                 <tr>
+                    <td>Dropped</td>
+                    <td>${droppedCount}</td>
+                    <td>${subjectStats.physics.dropped}</td>
+                    <td>${subjectStats.chemistry.dropped}</td>
+                    <td>${subjectStats.maths.dropped}</td>
+                </tr>
+                <tr>
                     <td>Score</td>
                     <td>${totalScore}</td>
-                    <td>${subjectStats.physics.correct * 4 - subjectStats.physics.incorrect}</td>
-                    <td>${subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect}</td>
-                    <td>${subjectStats.maths.correct * 4 - subjectStats.maths.incorrect}</td>
+                    <td>${subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4}</td>
+                    <td>${subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4}</td>
+                    <td>${subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4}</td>
                 </tr>
             </tbody>
         </table>
@@ -310,7 +333,7 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
         const userImgHTML = userAnswerImg ? `<img src="${userAnswerImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${userAnswerImg}', '_blank');">` : '';
 
         const row = `
-            <tr class="${status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : ''}">
+            <tr class="${status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : status === 'Dropped' ? 'table-warning' : ''}">
                 <td>${questionId}<br>${questionImgHTML}</td>
                 <td>${userAnswerId || ''}<br>${userImgHTML}</td>
                 <td>${correctAnswerId || ''}<br>${correctImgHTML}</td>
@@ -321,6 +344,7 @@ function displayResults({ results, correctCount, incorrectCount, attemptedCount,
 
     document.getElementById("resultsSection").classList.remove("d-none");
 }
+
 
 document.getElementById("toggleIncorrect").addEventListener("click", function () {
     const button = this;
@@ -347,22 +371,46 @@ function getSubjectFromQuestionId(questionId, subject) {
     return subject;
 }
 
-// storing score data in cloudflare db
-async function storeEvaluationData(uniqueId, examDate, totalScore) {
-    const payload = { id: uniqueId, examDate, totalScore};
+// storing JUST score data in cf db
+async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+    const payload = {
+        id: uniqueId,
+        examDate,
+        scores: {
+            physics: subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4,
+            chemistry: subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4,
+            maths: subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4,
+            totalScore,
+        },
+    };
 
     try {
-        await fetch("https://score-worker.iitjeepritam.workers.dev/", {
+        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
+            "https://score-worker.iitjeepritam.workers.dev/"
+        )}`;
+
+        const response = await fetch(proxyUrl, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
         });
+
+        if (!response.ok) {
+            throw new Error(`Failed to store score. HTTP status: ${response.status}`);
+        }
     } catch (error) {
-        console.error("Error storing data:", error.message);
+        console.error("Error storing evaluation score:", error.message);
     }
 }
 
-
+//giving unique id to each user
+function generateUniqueId() {
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10).replace(/-/g, "");
+    const time = now.toTimeString().slice(0, 8).replace(/:/g, "");
+    const milliseconds = now.getMilliseconds().toString().padStart(3, "0");
+    return `${date}-${time}-${milliseconds}`;
+}
 
