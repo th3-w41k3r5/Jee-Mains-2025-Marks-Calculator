@@ -348,8 +348,8 @@ function getSubjectFromQuestionId(questionId, subject) {
 }
 
 // storing score data in cloudflare db
-async function storeEvaluationData(uniqueId, examDate, scores) {
-    const payload = { id: uniqueId, examDate, scores };
+async function storeEvaluationData(uniqueId, examDate, totalScore) {
+    const payload = { id: uniqueId, examDate, totalScore};
 
     try {
         await fetch("https://score-worker.iitjeepritam.workers.dev/", {
