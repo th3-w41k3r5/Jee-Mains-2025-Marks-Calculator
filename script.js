@@ -350,7 +350,7 @@ function getSubjectFromQuestionId(questionId, subject) {
 // storing score data in cloudflare db
 async function storeEvaluationData(uniqueId, examDate, scores) {
     const payload = { id: uniqueId, examDate, scores };
-    const apiUrl = process.env.CF_WORKER_URL;
+    const apiUrl = "https://score-worker.iitjeepritam.workers.dev/";
 
     try {
         await fetch(apiUrl, {
