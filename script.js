@@ -350,10 +350,9 @@ function getSubjectFromQuestionId(questionId, subject) {
 // storing score data in cloudflare db
 async function storeEvaluationData(uniqueId, examDate, scores) {
     const payload = { id: uniqueId, examDate, scores };
-    const apiUrl = "https://score-worker.iitjeepritam.workers.dev/";
 
     try {
-        await fetch(apiUrl, {
+        await fetch("https://score-worker.iitjeepritam.workers.dev/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -364,5 +363,6 @@ async function storeEvaluationData(uniqueId, examDate, scores) {
         console.error("Error storing data:", error.message);
     }
 }
+
 
 
