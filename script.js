@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
-
 async function fetchHtmlThroughProxy(url) {
     try {
         const response = await fetch(`https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(url)}`);
@@ -148,15 +146,32 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const fileInput = document.getElementById("answerSheetFile");
-    const resultsSection = document.getElementById("resultsSection");
     const loadingSpinner = document.getElementById("loadingSpinner");
     let htmlContent = "";
 
-    // Show the spinner and hide the results section
+    // Validation: URL must start with "https://cdn3.digialm.com/"
+    if (urlInput && !urlInput.startsWith("https://cdn3.digialm.com/")) {
+        alert("Invalid URL. Only URLs starting with 'https://cdn3.digialm.com/' are allowed.");
+        return;
+    }
+
+    // Validation: File must be an HTML file starting with "cdn3.digialm.com"
+    if (fileInput.files.length) {
+        const file = fileInput.files[0];
+        const fileName = file.name.toLowerCase();
+
+        if (!fileName.endsWith(".html")) {
+            alert("Invalid file. Only .html files are allowed.");
+            return;
+        }
+    }
+
+    // Show the spinner and hide results section
     loadingSpinner.classList.remove("d-none");
-    resultsSection.classList.add("d-none");
+    document.getElementById("resultsSection").classList.add("d-none");
 
     try {
+        // Fetch HTML content
         if (fileInput.files.length) {
             const file = fileInput.files[0];
             htmlContent = await file.text();
@@ -172,8 +187,8 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             return;
         }
 
+        // Fetch and evaluate
         await fetchAnswerKeys();
-
         if (typeof answerKeys === "undefined") {
             alert("Answer keys could not be loaded. Please check your anskey.js file.");
             return;
@@ -188,12 +203,14 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         displayResults(evaluationResult);
     } catch (error) {
         alert("An error occurred. Please try again.");
+        console.error(error);
     } finally {
         // Hide the spinner and show results section
         loadingSpinner.classList.add("d-none");
-        resultsSection.classList.remove("d-none");
+        document.getElementById("resultsSection").classList.remove("d-none");
     }
 });
+
 
 
 
