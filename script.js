@@ -1,7 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
     const initialModal = new bootstrap.Modal(document.getElementById("initialModal"));
+
     initialModal.show();
+
+    const infoButton = document.getElementById("infoButton");
+    infoButton.addEventListener("click", () => {
+        initialModal.show();
+    });
 });
+
+
 
 
 async function fetchHtmlThroughProxy(url) {
