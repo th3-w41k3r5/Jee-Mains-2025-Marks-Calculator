@@ -125,8 +125,6 @@ function parseAnswerSheetHTML(htmlContent) {
 }
 
 
-
-
 document.getElementById("evaluationForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -192,9 +190,6 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 });
 
 
-
-
-
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
     let correctCount = 0, incorrectCount = 0, attemptedCount = 0;
@@ -256,7 +251,6 @@ function evaluateAnswers(userAnswers, answerKey) {
         subjectStats
     };
 }
-
 
 
 function displayResults({ results, correctCount, incorrectCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
@@ -352,4 +346,23 @@ document.getElementById("toggleIncorrect").addEventListener("click", function ()
 function getSubjectFromQuestionId(questionId, subject) {
     return subject;
 }
+
+// storing score data in cloudflare db
+async function storeEvaluationData(uniqueId, examDate, scores) {
+    const payload = { id: uniqueId, examDate, scores };
+    const apiUrl = process.env.CF_WORKER_URL;
+
+    try {
+        await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error("Error storing data:", error.message);
+    }
+}
+
 
