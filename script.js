@@ -131,6 +131,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const fileInput = document.getElementById("answerSheetFile");
     const loadingSpinner = document.getElementById("loadingSpinner");
+    const selectedExamDate = document.getElementById("examDate").value;
     let storageKey, htmlContent;
 
     if (urlInput) {
@@ -151,14 +152,12 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         return;
     }
 
-    // Checking Local Storage for Existing Data
     const cachedData = fetchFromLocalStorage(storageKey);
     if (cachedData) {
-        displayResults(cachedData); // Using cached data if available
+        displayResults(cachedData);
         return;
     }
 
-    // Processing New Data if Not in Local Storage
     loadingSpinner.classList.remove("d-none");
     document.getElementById("resultsSection").classList.add("d-none");
 
@@ -182,17 +181,41 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         }
 
         const userAnswers = parseAnswerSheetHTML(htmlContent);
+        const extractedDate = userAnswers.general_info.test_date;
+        const extractedTime = userAnswers.general_info.test_time;
+
+        const [day, month, year] = extractedDate.split("/");
+        const normalizedDate = `${year}-${month}-${day}`;
+
+        const shift = extractedTime.includes("9:00 AM") ? "shift-1" : "shift-2";
+
+        const constructedExamDate = `${normalizedDate}-${shift}`;
+
+        if (constructedExamDate !== selectedExamDate) {
+            alert(`The selected exam date (${selectedExamDate}) does not match the response sheet's date (${constructedExamDate}). Please select the correct date.`);
+            return;
+        }
+
         const evaluationResult = evaluateAnswers(
             userAnswers.questions,
-            answerKeys[document.getElementById("examDate").value]
+            answerKeys[selectedExamDate]
         );
 
+        if (
+            evaluationResult.correctCount === 0 &&
+            evaluationResult.incorrectCount === 0 &&
+            evaluationResult.attemptedCount === 0 &&
+            evaluationResult.droppedCount === 0
+        ) {
+            alert("No valid data found for the selected exam date. Please check your input.");
+            return;
+        }
+
         const uniqueId = generateUniqueId();
-        const examDate = document.getElementById("examDate").value;
 
-        storeEvaluationData(uniqueId, examDate, evaluationResult.subjectStats, evaluationResult.totalScore);
+        storeEvaluationData(uniqueId, selectedExamDate, evaluationResult.subjectStats, evaluationResult.totalScore);
 
-        saveToLocalStorage(storageKey, evaluationResult);
+        saveToLocalStorage(storageKey, { ...evaluationResult, selectedExamDate });
 
         displayResults(evaluationResult);
     } catch (error) {
@@ -203,7 +226,6 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         document.getElementById("resultsSection").classList.remove("d-none");
     }
 });
-
 
 
 function evaluateAnswers(userAnswers, answerKey) {
