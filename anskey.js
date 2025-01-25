@@ -1,3 +1,5 @@
+window.answerKeysVersion = "25.01.25";
+
 const answerKeys = {
     "2024-01-27-shift-1": {
         "533543377": "5335431363",

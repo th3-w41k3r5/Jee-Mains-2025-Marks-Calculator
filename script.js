@@ -32,11 +32,17 @@ async function fetchAnswerKeys() {
         keysScript.type = 'text/javascript';
         keysScript.text = text;
         document.head.appendChild(keysScript);
+
+        // Ensure answerKeysVersion is defined
+        if (typeof window.answerKeysVersion === "undefined") {
+            throw new Error("Answer keys version is not defined in anskey.js");
+        }
     } catch (error) {
         console.error("Error fetching answer keys:", error);
         alert("Failed to fetch answer keys: " + error.message);
     }
 }
+
 
 
 function parseAnswerSheetHTML(htmlContent) {
@@ -134,6 +140,11 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     const selectedExamDate = document.getElementById("examDate").value;
     let storageKey, htmlContent;
 
+    if (typeof window.answerKeysVersion === "undefined") {
+        alert("Answer keys version is not available. Please check anskey.js.");
+        return;
+    }
+
     if (urlInput) {
         if (!urlInput.startsWith("https://cdn3.digialm.com/")) {
             alert("Invalid URL. Only URLs starting with 'https://cdn3.digialm.com/' are allowed.");
@@ -146,18 +157,24 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             alert("Invalid file. Only .html files are allowed.");
             return;
         }
-        storageKey = await hashFile(file);
+        storageKey = await hashFile(file); // Generate hash for the file
     } else {
         alert("Please provide a file or URL.");
         return;
     }
 
+    // Check Local Storage for Existing Data
     const cachedData = fetchFromLocalStorage(storageKey);
     if (cachedData) {
-        displayResults(cachedData);
-        return;
+        if (cachedData.answerKeysVersion === window.answerKeysVersion) {
+            displayResults(cachedData);
+            return;
+        } else {
+            console.log("Answer keys have been updated. Recalculating results...");
+        }
     }
 
+    // Process New Data if Not in Local Storage
     loadingSpinner.classList.remove("d-none");
     document.getElementById("resultsSection").classList.add("d-none");
 
@@ -174,33 +191,41 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             return;
         }
 
+        // Fetch Answer Keys
         await fetchAnswerKeys();
         if (typeof answerKeys === "undefined") {
             alert("Answer keys could not be loaded. Please check your anskey.js file.");
             return;
         }
 
+        // Parse Answers and Validate Exam Date
         const userAnswers = parseAnswerSheetHTML(htmlContent);
-        const extractedDate = userAnswers.general_info.test_date;
-        const extractedTime = userAnswers.general_info.test_time;
+        const extractedDate = userAnswers.general_info.test_date; // Example: "29/01/2024"
+        const extractedTime = userAnswers.general_info.test_time; // Example: "9:00 AM - 12:00 PM"
 
+        // Normalize Date Format
         const [day, month, year] = extractedDate.split("/");
         const normalizedDate = `${year}-${month}-${day}`;
 
+        // Determine Shift
         const shift = extractedTime.includes("9:00 AM") ? "shift-1" : "shift-2";
 
+        // Construct Full Date-Shift Format
         const constructedExamDate = `${normalizedDate}-${shift}`;
 
+        // Validate Against Selected Exam Date
         if (constructedExamDate !== selectedExamDate) {
             alert(`The selected exam date (${selectedExamDate}) does not match the response sheet's date (${constructedExamDate}). Please select the correct date.`);
             return;
         }
 
+        // Evaluate Answers
         const evaluationResult = evaluateAnswers(
             userAnswers.questions,
             answerKeys[selectedExamDate]
         );
 
+        // Prevent Storing Invalid Data
         if (
             evaluationResult.correctCount === 0 &&
             evaluationResult.incorrectCount === 0 &&
@@ -213,10 +238,13 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 
         const uniqueId = generateUniqueId();
 
+        // Save and Upload Data
         storeEvaluationData(uniqueId, selectedExamDate, evaluationResult.subjectStats, evaluationResult.totalScore);
 
-        saveToLocalStorage(storageKey, { ...evaluationResult, selectedExamDate });
+        // Save to Local Storage with Answer Key Version
+        saveToLocalStorage(storageKey, { ...evaluationResult, selectedExamDate, answerKeysVersion });
 
+        // Display Results
         displayResults(evaluationResult);
     } catch (error) {
         console.error(error);
@@ -226,6 +254,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         document.getElementById("resultsSection").classList.remove("d-none");
     }
 });
+
 
 
 function evaluateAnswers(userAnswers, answerKey) {
