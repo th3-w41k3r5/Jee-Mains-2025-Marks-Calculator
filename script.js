@@ -131,23 +131,34 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     const urlInput = document.getElementById("answerSheetUrl").value.trim();
     const fileInput = document.getElementById("answerSheetFile");
     const loadingSpinner = document.getElementById("loadingSpinner");
-    let htmlContent = "";
+    let storageKey, htmlContent;
 
-    if (urlInput && !urlInput.startsWith("https://cdn3.digialm.com/")) {
-        alert("Invalid URL. Only URLs starting with 'https://cdn3.digialm.com/' are allowed.");
-        return;
-    }
-
-    if (fileInput.files.length) {
+    if (urlInput) {
+        if (!urlInput.startsWith("https://cdn3.digialm.com/")) {
+            alert("Invalid URL. Only URLs starting with 'https://cdn3.digialm.com/' are allowed.");
+            return;
+        }
+        storageKey = generateStorageKey(urlInput);
+    } else if (fileInput.files.length) {
         const file = fileInput.files[0];
-        const fileName = file.name.toLowerCase();
-
-        if (!fileName.endsWith(".html")) {
+        if (!file.name.toLowerCase().endsWith(".html")) {
             alert("Invalid file. Only .html files are allowed.");
             return;
         }
+        storageKey = await hashFile(file);
+    } else {
+        alert("Please provide a file or URL.");
+        return;
     }
 
+    // Checking Local Storage for Existing Data
+    const cachedData = fetchFromLocalStorage(storageKey);
+    if (cachedData) {
+        displayResults(cachedData); // Using cached data if available
+        return;
+    }
+
+    // Processing New Data if Not in Local Storage
     loadingSpinner.classList.remove("d-none");
     document.getElementById("resultsSection").classList.add("d-none");
 
@@ -157,9 +168,6 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             htmlContent = await file.text();
         } else if (urlInput) {
             htmlContent = await fetchHtmlThroughProxy(urlInput);
-        } else {
-            alert("Please provide a file or URL.");
-            return;
         }
 
         if (!htmlContent) {
@@ -182,22 +190,20 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         const uniqueId = generateUniqueId();
         const examDate = document.getElementById("examDate").value;
 
-        storeEvaluationData(
-            uniqueId,
-            examDate,
-            evaluationResult.subjectStats,
-            evaluationResult.totalScore
-        );
+        storeEvaluationData(uniqueId, examDate, evaluationResult.subjectStats, evaluationResult.totalScore);
+
+        saveToLocalStorage(storageKey, evaluationResult);
 
         displayResults(evaluationResult);
     } catch (error) {
-        alert("An error occurred. Please try again.");
         console.error(error);
+        alert("An error occurred. Please try again.");
     } finally {
         loadingSpinner.classList.add("d-none");
         document.getElementById("resultsSection").classList.remove("d-none");
     }
 });
+
 
 
 function evaluateAnswers(userAnswers, answerKey) {
@@ -371,7 +377,7 @@ function getSubjectFromQuestionId(questionId, subject) {
     return subject;
 }
 
-// storing JUST score data in cf db
+// storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
     const payload = {
         id: uniqueId,
@@ -383,6 +389,8 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
             totalScore,
         },
     };
+
+    saveToLocalStorage(uniqueId, payload);
 
     try {
         const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
@@ -405,6 +413,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     }
 }
 
+
 //giving unique id to each user
 function generateUniqueId() {
     const now = new Date();
@@ -414,3 +423,23 @@ function generateUniqueId() {
     return `${date}-${time}-${milliseconds}`;
 }
 
+// storing data in local storage if user wants to see the data again, giving faster access
+function saveToLocalStorage(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+}
+
+function fetchFromLocalStorage(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+}
+
+function generateStorageKey(input) {
+    return btoa(input); // Base64 encode for simplicity
+}
+
+async function hashFile(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
