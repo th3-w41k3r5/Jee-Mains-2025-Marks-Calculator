@@ -440,7 +440,6 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
     }
 }
 
-
 //giving unique id to each user
 function generateUniqueId() {
     const now = new Date();
@@ -449,6 +448,7 @@ function generateUniqueId() {
     const milliseconds = now.getMilliseconds().toString().padStart(3, "0");
     return `${date}-${time}-${milliseconds}`;
 }
+
 
 // storing data in local storage if user wants to see the data again, giving faster access
 function saveToLocalStorage(key, data) {
