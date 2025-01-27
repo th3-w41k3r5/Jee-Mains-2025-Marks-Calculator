@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+document.getElementById("removeFile").addEventListener("click", () => {
+    const fileInput = document.getElementById("answerSheetFile");
+    fileInput.value = "";
+});
+
 
 async function fetchHtmlThroughProxy(url) {
     try {
@@ -128,6 +133,11 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     const selectedExamDate = document.getElementById("examDate").value;
     let storageKey, htmlContent;
 
+    if (urlInput && fileInput.files.length > 0) {
+        alert("Please use only one input method: either upload a file or enter a URL.");
+        return;
+    }
+
     if (typeof window.answerKeysVersion === "undefined") {
         alert("Answer keys version is not available. Please check anskey.js.");
         return;
@@ -231,6 +241,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
         document.getElementById("resultsSection").classList.remove("d-none");
     }
 });
+
 
 
 function evaluateAnswers(userAnswers, answerKey) {

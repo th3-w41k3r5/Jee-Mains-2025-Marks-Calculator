@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JEE Mains 2025 Score Calculator </title>
+    <meta name="description" content="JEE Mains 2025 Score Calculator: Calculate your JEE Mains 2025 score using your response sheet URL or HTML file provided by NTA.">
+    <!--<meta name="keywords" content="JEE Mains 2025, JEE Score Calculator, JEE Mains Session 1, NTA response sheet, JEE 2025 scorecard, JEE score evaluation, JEE exam analysis, JEE result checker">
+    <meta name="author" content="Novadrone16">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://j2025scorecard.netlify.app/">
+    <meta property="og:title" content="JEE Mains 2025 Score Calculator">
+    <meta property="og:description" content="Easily calculate your JEE Mains 2025 score with this tool using your response sheet.">
+    <meta property="og:url" content="https://j2025scorecard.netlify.app/">
+    <meta property="og:type" content="website">-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
@@ -56,6 +65,9 @@
             width: 3rem;
             height: 3rem;
         } 
+        .trash-icon {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -120,11 +132,21 @@
                 </select>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
                 <label for="answerSheetFile" class="form-label">Upload Response Sheet File (must be a <code>.html</code> file):</label>
-                <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
+                <div class="input-group">
+                    <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
+                    <span class="input-group-text bg-dark text-light trash-icon" id="removeFile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                        </svg>
+                    </span>
+                </div>
             </div>
-
+            
+            
+            
             <div class="mb-3">
                 <label for="answerSheetUrl" class="form-label">Or Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
                 <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
@@ -181,3 +203,17 @@
 </html>
 
 
+
+
+
+
+
+
+
+
+<meta property="og:image" content="https://j2025scorecard.netlify.app/assets/jee-score-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JEE Mains 2025 Score Calculator">
+<meta name="twitter:description" content="Calculate your JEE Mains 2025 score with ease using this online tool. Supports response sheet URLs and HTML files.">
+<meta name="twitter:image" content="https://j2025scorecard.netlify.app/assets/jee-score-preview.png">
+<meta name="twitter:url" content="https://j2025scorecard.netlify.app/">
