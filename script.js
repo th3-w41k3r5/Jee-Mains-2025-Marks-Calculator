@@ -276,7 +276,8 @@ function evaluateAnswers(userAnswers, answerKey) {
             attemptedCount++;
             subjectStats[subject].attempted++;
 
-            if (userAnswerId === correctAnswerId) {
+            const correctAnswers = correctAnswerId.includes(",") ? correctAnswerId.split(",") : [correctAnswerId];
+            if (correctAnswers.includes(userAnswerId)) {
                 correctCount++;
                 subjectStats[subject].correct++;
                 status = "Correct";
