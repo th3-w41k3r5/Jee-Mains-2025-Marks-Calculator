@@ -117,16 +117,21 @@
             <div class="mb-3">
                 <label for="examDate" class="form-label">Select Exam Date and Shift:</label>
                 <select id="examDate" class="form-select bg-dark text-light">
-                    <option value="2025-01-22-shift-1">22nd Jan, Shift 1</option>
-                    <option value="2025-01-22-shift-2">22nd Jan, Shift 2</option>
-                    <option value="2025-01-23-shift-1">23rd Jan, Shift 1</option>
-                    <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option>
-                    <option value="2025-01-24-shift-1">24th Jan, Shift 1</option>
-                    <option value="2025-01-24-shift-2">24th Jan, Shift 2</option>
-                    <option value="2025-01-28-shift-1">28th Jan, Shift 1</option>
-                    <option value="2025-01-28-shift-2">28th Jan, Shift 2</option>
-                    <option value="2025-01-29-shift-1">29th Jan, Shift 1</option>
-                    <option value="2025-01-29-shift-2">29th Jan, Shift 2</option>
+                    <optgroup label="Session 1">
+                        <option value="2025-01-22-shift-1">22nd Jan, Shift 1</option>
+                        <option value="2025-01-22-shift-2">22nd Jan, Shift 2</option>
+                        <option value="2025-01-23-shift-1">23rd Jan, Shift 1</option>
+                        <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option>
+                        <option value="2025-01-24-shift-1">24th Jan, Shift 1</option>
+                        <option value="2025-01-24-shift-2">24th Jan, Shift 2</option>
+                        <option value="2025-01-28-shift-1">28th Jan, Shift 1</option>
+                        <option value="2025-01-28-shift-2">28th Jan, Shift 2</option>
+                        <option value="2025-01-29-shift-1">29th Jan, Shift 1</option>
+                        <option value="2025-01-29-shift-2">29th Jan, Shift 2</option>
+                    </optgroup>
+                    <!--<optgroup label="Session 2">
+                        <option value="">Exam Not Completed</option>
+                    </optgroup>-->
                 </select>
             </div>
 
@@ -142,8 +147,6 @@
                     </span>
                 </div>
             </div>
-            
-            
             
             <div class="mb-3">
                 <label for="answerSheetUrl" class="form-label">Or Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
