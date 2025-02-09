@@ -85,7 +85,8 @@ document.getElementById("percentileForm").addEventListener("submit", async funct
         modalScore.innerHTML = `<span class="text-blue-400 font-bold">${score}</span>`;
         modalPercentile.innerHTML = `<span class="text-green-400 font-bold text-xl">${parseFloat(data.percentile).toFixed(2)}%ile</span>`;
         modalExamShift.innerHTML = `<span class="text-yellow-400 font-semibold">${formattedExamShift}</span>`;
-        modalScoresRecorded.innerHTML = `<span class="text-white">${data.totalScoresRecorded}</span>`;
+        modalScoresRecorded.innerHTML = `<span class="text-white">${data.totalScoresRecorded} </span>`;
+        document.getElementById("modalExamShiftInline").textContent = formattedExamShift;
 
         modal.classList.remove("hidden");
         setTimeout(() => modalContent.classList.add("scale-100", "opacity-100"), 10);
@@ -123,7 +124,6 @@ function startCountdown(resetAt) {
             return;
         }
 
-        // ✅ Fix: Update timerDisplay properly
         if (document.getElementById("timerDisplay")) {
             const hours = Math.floor(remaining / (1000 * 60 * 60));
             const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
