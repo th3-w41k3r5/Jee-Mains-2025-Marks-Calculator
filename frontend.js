@@ -2,7 +2,7 @@ document.getElementById("percentileForm").addEventListener("submit", async funct
     e.preventDefault();
 
     const score = parseFloat(document.getElementById("score").value);
-    const mathsScore = parseFloat(document.getElementById("mathScore").value);
+    const mathScore = parseFloat(document.getElementById("mathScore").value);
     const phyScore = parseFloat(document.getElementById("phyScore").value);
     const chemScore = parseFloat(document.getElementById("chemScore").value);
     const examShift = document.getElementById("examShift").value;
@@ -59,7 +59,7 @@ document.getElementById("percentileForm").addEventListener("submit", async funct
         const response = await fetch(`${CORS_PROXY}?url=${encodeURIComponent(API_URL)}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ score, mathsScore, phyScore, chemScore, examShift }),
+            body: JSON.stringify({ score, mathScore, phyScore, chemScore, examShift }),
         });
 
         clearTimeout(timeout);
