@@ -16,19 +16,15 @@ document.getElementById("removeFile").addEventListener("click", () => {
 
 
 async function fetchHtmlThroughProxy(url) {
-    if (!/^https:\/\/cdn3\.digialm\.com\//.test(url)) { 
-        alert("Bypass detected! Only cdn3.digialm.com URLs are allowed.");
-        throw new Error("Blocked request to non-cdn3.digialm.com URL.");
-    }
-    
     try {
         const response = await fetch(`https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(url)}`);
         return await response.text();
     } catch (error) {
-        console.error("Fetch failed:", error);
+        alert("Failed to fetch HTML through proxy: " + error.message);
         return null;
     }
 }
+
 
 async function fetchAnswerKeys() {
     try {
