@@ -268,7 +268,7 @@ function evaluateAnswers(userAnswers, answerKey) {
             subjectStats[subject] = { attempted: 0, correct: 0, incorrect: 0, dropped: 0 };
         }
 
-        if (correctAnswerId === "DROP") {
+        if (correctAnswerId === "Drop") {
             droppedCount++;
             subjectStats[subject].dropped++;
             status = "Dropped";
