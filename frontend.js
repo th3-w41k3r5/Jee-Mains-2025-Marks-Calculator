@@ -64,7 +64,11 @@ document.getElementById("percentileForm").addEventListener("submit", async funct
 
         clearTimeout(timeout);
 
-        if (!response.ok) throw new Error("Error calculating percentile.");
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Error calculating percentile.");
+        }
+    
 
         const data = await response.json();
 
@@ -98,7 +102,7 @@ document.getElementById("percentileForm").addEventListener("submit", async funct
 
     } catch (error) {
         console.error(error);
-        alert("Error calculating percentile. Please try again.");
+        alert(error.message);
 
         clearTimeout(timeout);
         calculateText.textContent = "Calculate Percentile";
