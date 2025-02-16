@@ -79,7 +79,7 @@
                 </div>
                 <div class="modal-body">
                     <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1.5rem; color: #34d399;">
-                        Updated with s1 FINAL ans key
+                        Updated with s1 FINAL ans key and B.Arch provisional key
                     </p>
                     <!--<p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1.5rem; color: #ced334;">
                         Predict your percentile (based on approx 2k unique scores per shift) - <a href="/percentile-predictor.html" class="text-primary" style="text-decoration: none;">Click Here</a>
@@ -124,13 +124,14 @@
                         <option value="2025-01-22-shift-1">22nd Jan, Shift 1</option>
                         <option value="2025-01-22-shift-2">22nd Jan, Shift 2</option>
                         <option value="2025-01-23-shift-1">23rd Jan, Shift 1</option>
-                        <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option><!---->
+                        <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option>
                         <option value="2025-01-24-shift-1">24th Jan, Shift 1</option>
                         <option value="2025-01-24-shift-2">24th Jan, Shift 2</option>
-                        <option value="2025-01-28-shift-1">28th Jan, Shift 1</option><!---->
+                        <option value="2025-01-28-shift-1">28th Jan, Shift 1</option>
                         <option value="2025-01-28-shift-2">28th Jan, Shift 2</option>
                         <option value="2025-01-29-shift-1">29th Jan, Shift 1</option>
-                        <option value="2025-01-29-shift-2">29th Jan, Shift 2</option><!---->
+                        <option value="2025-01-29-shift-2">29th Jan, Shift 2</option>
+                        <option value="2025-01-30-shift-2">30th Jan, Shift 2 (B.Arch)</option>
                     </optgroup>
                     <!--<optgroup label="Session 2">
                         <option value="">Exam Not Completed</option>
@@ -138,8 +139,13 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="answerSheetUrl" class="form-label">Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
+                <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
+            </div>
+
             <div class="mb-3 position-relative">
-                <label for="answerSheetFile" class="form-label">Upload Response Sheet File (must be a <code>.html</code> file):</label>
+                <label for="answerSheetFile" class="form-label"><b>OR</b> Upload Response Sheet html File:</label>
                 <div class="input-group">
                     <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
                     <span class="input-group-text bg-dark text-light trash-icon" id="removeFile">
@@ -149,11 +155,6 @@
                         </svg>
                     </span>
                 </div>
-            </div>
-            
-            <div class="mb-3">
-                <label for="answerSheetUrl" class="form-label">Or Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
-                <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Evaluate</button>
