@@ -60,15 +60,15 @@ function parseAnswerSheetHTML(htmlContent) {
 
         let subject = "unknown";
         if (sectionLabel?.includes("Mathematics")) {
-            subject = "Maths";
+            subject = "maths";
         } else if (sectionLabel?.includes("Physics")) {
-            subject = "Physics";
+            subject = "physics";
         } else if (sectionLabel?.includes("Chemistry")) {
-            subject = "Chemistry";
+            subject = "chemistry";
         } else if (sectionLabel?.includes("Aptitude Test")) {
-            subject = "Aptitude";
+            subject = "aptitude";
         } else if (sectionLabel?.includes("Planning")) {
-            subject = "Planning";
+            subject = "planning";
         }
 
         const questionImgTag = panel.querySelector('td.bold[valign="top"] img');
@@ -266,7 +266,7 @@ function evaluateAnswers(userAnswers, answerKey) {
         const questionImg = userAnswerDetails?.question_img || null;
 
         let status = "Unattempted";
-        const subject = userAnswerDetails?.subject || "unknown";
+        let subject = userAnswerDetails?.subject?.toLowerCase() || "unknown";
 
         if (!subjectStats[subject]) {
             subjectStats[subject] = { attempted: 0, correct: 0, incorrect: 0, dropped: 0 };
@@ -317,6 +317,9 @@ function evaluateAnswers(userAnswers, answerKey) {
     };
 }
 
+function capitalize(subject) {
+    return subject.charAt(0).toUpperCase() + subject.slice(1);
+}
 
 function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalScore, subjectStats }) {
     const resultsTable = document.getElementById("resultsTable");
@@ -326,7 +329,7 @@ function displayResults({ results, correctCount, incorrectCount, droppedCount, a
 
     let tableHeaders = `<th></th><th>Total</th>`;
     subjects.forEach(subject => {
-        tableHeaders += `<th>${subject.replace(/-/g, " & ")}</th>`; 
+        tableHeaders += `<th>${capitalize(subject.replace(/-/g, " & "))}</th>`;
     });
 
     let tableRows = `
@@ -420,8 +423,9 @@ function getSubjectFromQuestionId(questionId, subject) {
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
-    
-    const isPCM = subjectStats.physics || subjectStats.chemistry || subjectStats.maths;
+
+    const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
+    const isAptitudePlanning = subjectStats.aptitude?.attempted > 0 || subjectStats.planning?.attempted > 0;
 
     const payload = {
         id: uniqueId,
@@ -429,9 +433,15 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         scores: {
             physics: isPCM ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) : "-",
             chemistry: isPCM ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) : "-",
-            maths: isPCM ? (subjectStats.maths?.correct * 4 - subjectStats.maths?.incorrect + subjectStats.maths?.dropped * 4) : "-",
-            aptitude: isPCM ? "-" : (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4),
-            planning: isPCM ? "-" : (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4),
+            maths: subjectStats.maths?.attempted > 0 
+                ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
+                : "-",
+            aptitude: isAptitudePlanning ? 
+                (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
+                : "-",
+            planning: isAptitudePlanning ? 
+                (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
+                : "-",
             totalScore,
         },
     };
