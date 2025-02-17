@@ -425,23 +425,33 @@ function getSubjectFromQuestionId(questionId, subject) {
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
 
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
-    const isAptitudePlanning = subjectStats.aptitude?.attempted > 0 || subjectStats.planning?.attempted > 0;
+    const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
+    const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
 
     const payload = {
         id: uniqueId,
         examDate,
         scores: {
-            physics: isPCM ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) : "-",
-            chemistry: isPCM ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) : "-",
+            physics: isPCM 
+                ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
+                : "-",
+    
+            chemistry: isPCM 
+                ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
+                : "-",
+    
             maths: subjectStats.maths?.attempted > 0 
                 ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
                 : "-",
-            aptitude: isAptitudePlanning ? 
-                (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
+    
+            aptitude: isMathsAptitude 
+                ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
                 : "-",
-            planning: isAptitudePlanning ? 
-                (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
+    
+            planning: isMathsAptitudePlanning 
+                ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
                 : "-",
+    
             totalScore,
         },
     };
@@ -499,3 +509,6 @@ async function hashFile(file) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
+
+
+
