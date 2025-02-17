@@ -318,20 +318,17 @@ function evaluateAnswers(userAnswers, answerKey) {
 }
 
 
-function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalQuestions, totalScore, subjectStats }) {
+function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalScore, subjectStats }) {
     const resultsTable = document.getElementById("resultsTable");
     const summarySection = document.getElementById("resultsSummary");
 
-    // Detect which subjects are present
     const subjects = Object.keys(subjectStats).filter(subject => subjectStats[subject].attempted > 0);
 
-    // Build table headers dynamically
     let tableHeaders = `<th></th><th>Total</th>`;
     subjects.forEach(subject => {
-        tableHeaders += `<th>${subject.replace(/-/g, " & ")}</th>`;  // Format names like "maths-aptitude"
+        tableHeaders += `<th>${subject.replace(/-/g, " & ")}</th>`; 
     });
 
-    // Build table rows dynamically
     let tableRows = `
         <tr><td>Attempted</td><td>${attemptedCount}</td>`;
     subjects.forEach(subject => {
@@ -367,7 +364,6 @@ function displayResults({ results, correctCount, incorrectCount, droppedCount, a
     });
     tableRows += `</tr>`;
 
-    // Display final summary section
     summarySection.innerHTML = `
         <h3>Your Score: ${totalScore}</h3>
         <table class="table table-bordered">
@@ -424,13 +420,18 @@ function getSubjectFromQuestionId(questionId, subject) {
 
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
+    
+    const isPCM = subjectStats.physics || subjectStats.chemistry || subjectStats.maths;
+
     const payload = {
         id: uniqueId,
         examDate,
         scores: {
-            physics: subjectStats.physics.correct * 4 - subjectStats.physics.incorrect + subjectStats.physics.dropped * 4,
-            chemistry: subjectStats.chemistry.correct * 4 - subjectStats.chemistry.incorrect + subjectStats.chemistry.dropped * 4,
-            maths: subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4,
+            physics: isPCM ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) : "-",
+            chemistry: isPCM ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) : "-",
+            maths: isPCM ? (subjectStats.maths?.correct * 4 - subjectStats.maths?.incorrect + subjectStats.maths?.dropped * 4) : "-",
+            aptitude: isPCM ? "-" : (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4),
+            planning: isPCM ? "-" : (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4),
             totalScore,
         },
     };
