@@ -482,3 +482,5 @@ async function hashFile(file) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
+
+
