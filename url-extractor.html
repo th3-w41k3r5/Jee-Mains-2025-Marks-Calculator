@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Extractor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.min.mjs" type="module" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            padding-top: 40px;
+        }
+        .container {
+            max-width: 650px;
+        }
+        .card {
+            background-color: #2b2b2b;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+            border-bottom: none;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: rgb(227, 227, 227);
+        }
+        .custom-file-button input[type=file] {
+            display: none;
+        }
+        .custom-file-button .btn {
+            width: 100%;
+        }
+        #fileNameDisplay {
+            margin-top: 10px;
+            font-style: italic;
+            color: #adb5bd;
+            word-break: break-all;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #333;
+            border-radius: 5px;
+            min-height: 60px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #result.visible {
+            opacity: 1;
+        }
+        #result a {
+            color: #64b5f6;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        #result a:hover {
+            text-decoration: underline;
+        }
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+        }
+        #loadingSpinner { display: none; }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100">
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center fs-4">
+                <i class="bi bi-file-earmark-arrow-up-fill me-2"></i>Response Sheet URL Extractor
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label for="pdfInput" class="text-white form-label">Select Response Sheet PDF File:</label>
+                    <div class="custom-file-button">
+                        <input type="file" id="pdfInput" class="form-control" accept="application/pdf">
+                        <label for="pdfInput" class="btn btn-outline-primary">
+                            <i class="bi bi-folder2-open"></i> Choose File...
+                        </label>
+                    </div>
+                    <div id="fileNameDisplay">No file selected</div>
+                </div>
+
+                <button id="extractButton" class="btn btn-primary w-100 mt-3 py-2">
+                    <i class="bi bi-search me-2"></i>Extract URL
+                </button>
+
+                <div id="result" class="text-center">
+                    <div id="loadingSpinner" class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const fileInput = document.getElementById("pdfInput");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+        const extractButton = document.getElementById('extractButton');
+        const resultDiv = document.getElementById('result');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+
+            if (typeof pdfjsLib === 'undefined') {
+                handleLibraryLoadError();
+                return;
+            }
+
+            try {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.worker.min.mjs`;
+            } catch (e) {
+                console.error("Error configuring pdfjsLib worker:", e);
+                showResult("<p class='text-danger'>Error configuring PDF worker. Cannot process files.</p>", true);
+                if (extractButton) extractButton.disabled = true;
+                return;
+            }
+
+            if (extractButton) {
+                extractButton.onclick = extractUrl;
+            } else {
+                console.error("Extract button not found!");
+            }
+
+            if(fileInput && fileNameDisplay) {
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length > 0) {
+                        fileNameDisplay.textContent = "PDF file added, click 'Extract URL' now";
+                        showResult("", false);
+                    } else {
+                        fileNameDisplay.textContent = "No file selected";
+                    }
+                });
+            }
+        });
+
+        function showLoading(isLoading) {
+            if (loadingSpinner) {
+                loadingSpinner.style.display = isLoading ? 'block' : 'none';
+            }
+
+            if(isLoading) {
+                resultDiv.classList.add('visible');
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(loadingSpinner);
+            }
+        }
+
+        function showResult(htmlContent, isError = false) {
+            resultDiv.innerHTML = htmlContent;
+            resultDiv.classList.remove('text-danger', 'text-success');
+            if (htmlContent) {
+                resultDiv.classList.add(isError ? 'text-danger' : 'text-success');
+                resultDiv.classList.add('visible');
+            } else {
+                resultDiv.classList.remove('visible');
+            }
+            showLoading(false);
+        }
+
+        function handleLibraryLoadError() {
+            console.error("PDF.js library (pdfjsLib) failed to load.");
+            showResult("<p class='text-danger fw-bold'>Critical Error: PDF library failed to load.<br>Please check your internet connection or refresh the page.</p>", true);
+            if (extractButton) extractButton.disabled = true;
+            if (fileInput) fileInput.disabled = true;
+        }
+
+        //Main PDF Extraction Logics
+        async function extractUrl() {
+            if (typeof pdfjsLib === 'undefined') {
+                handleLibraryLoadError();
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file) {
+                showResult("<p class='text-warning'>Please select a PDF file first.</p>", true);
+                return;
+            }
+
+            showLoading(true);
+            if (extractButton) extractButton.disabled = true;
+
+            const reader = new FileReader();
+
+            reader.onload = async function () {
+                try {
+                    const typedArray = new Uint8Array(this.result);
+                    const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+                    const metadata = await pdf.getMetadata();
+                    let urlFound = null;
+
+                    if (metadata && metadata.info && metadata.info.Title) {
+                        const title = metadata.info.Title;
+                        const urlRegex = /(cdn3\.digialm\.com\/[^\s<>"]+)/i;
+                        const titleMatch = title.match(urlRegex);
+                        if (titleMatch && titleMatch[0]) {
+                            urlFound = "https://" + titleMatch[0];
+                        }
+                    }
+
+                    if (urlFound) {
+                        let cleanedUrl = urlFound;
+                        if (cleanedUrl.endsWith('#')) {
+                            cleanedUrl = cleanedUrl.slice(0, -1);
+                        }
+                        cleanedUrl = cleanedUrl.replace(/[.,;)!?]*$/, '');
+                        showResult(`
+                            <p class="fw-bold" style="color:#34d399;">Extracted Response Sheet URL:</p>
+                            <p><a href="${cleanedUrl}" target="_blank">${cleanedUrl}</a></p>
+                            <p class="text-warning fw-bold">Please once check if it's your response sheet or not!</p>
+                        `);
+                    } else {
+                        showResult("<p class='text-warning'>No URL starting with 'cdn3.digialm.com' found in the PDF.</p>", true);
+                    }
+
+                } catch (error) {
+                    console.error("Error processing PDF:", error);
+                    let errorMessage = "Error processing PDF.";
+
+                    if (error.name === 'PasswordException') { errorMessage = 'PDF is password protected.'; }
+                    else if (error.name === 'InvalidPDFException') { errorMessage = 'Invalid or corrupt PDF file.'; }
+                    else if (error.name === 'MissingPDFException') { errorMessage = 'Cannot load PDF data.'; }
+                    else if (error.name === 'UnexpectedResponseException') { errorMessage = 'Network error loading PDF data.'; }
+                    else if (error instanceof Error) { errorMessage += ` (${error.name})`; }
+
+                    showResult(`<p class='text-danger fw-bold'>Error:</p><p>${errorMessage}</p>`, true);
+                } finally {
+                    if (extractButton) extractButton.disabled = false;
+                    showLoading(false);
+                }
+            };
+
+            reader.onerror = function(event) {
+                console.error("File Reading Error:", event.target.error);
+                showResult("<p class='text-danger'>Error reading the selected file.</p>", true);
+                if (extractButton) extractButton.disabled = false;
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>

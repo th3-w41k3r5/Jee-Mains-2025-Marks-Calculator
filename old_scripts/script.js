@@ -1,3 +1,5 @@
+//only jee main version (v1) [DISABLED]
+
 document.addEventListener("DOMContentLoaded", () => {
     const initialModal = new bootstrap.Modal(document.getElementById("initialModal"));
 
@@ -243,7 +245,6 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 });
 
 
-
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
     let correctCount = 0, incorrectCount = 0, attemptedCount = 0, droppedCount = 0;
@@ -460,7 +461,6 @@ function generateUniqueId() {
     const milliseconds = now.getMilliseconds().toString().padStart(3, "0");
     return `${date}-${time}-${milliseconds}`;
 }
-
 
 // storing data in local storage if user wants to see the data again, giving faster access
 function saveToLocalStorage(key, data) {

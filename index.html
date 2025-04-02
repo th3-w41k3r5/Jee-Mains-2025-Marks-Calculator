@@ -29,6 +29,7 @@
         gtag('config', 'G-NZ2TCWXZLL');
       </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins:wght@300;400;500;600;700&display=swap');
         body {
             background-color: #121212;
             color: #e0e0e0;
@@ -68,6 +69,93 @@
         .trash-icon {
             cursor: pointer;
         }
+        #filterDropdown {
+            min-width: 190px;
+            padding: 8px;
+            /*background: rgb(212, 212, 212);*/
+            background: #e9fbff;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.12s ease-in-out, transform 0.12s ease-in-out;
+            display: none;
+            z-index: 1051;
+        }
+        #filterDropdown label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        #filterDropdown label:hover {
+            background: rgba(0, 116, 217, 0.1);
+        }
+        #filterDropdown button {
+            width: 48%;
+            font-size: 14px;
+            padding: 6px;
+        }
+        #filterDropdown hr {
+            margin: 8px 0;
+        }
+        .show {
+            display: block !important;
+        }
+        #filterDropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px) translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+        }
+        .show-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        #menuContent {
+            opacity: 0;
+            transform: translateY(-5px);
+            display: none;
+        }
+        #menuContent.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        .menu-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        @media (min-width: 1200px) {
+            #urlMaskOverlay {
+                display: flex !important;
+            }
+        }
+        @media (max-width: 1199px) {
+            #urlMaskOverlay {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -79,25 +167,22 @@
                 </div>
                 <div class="modal-body">
                     <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1.5rem; color: #34d399;">
-                        Updated with s1 FINAL ans key and B arch + plan prov ans key
+                        When S2 response sheets are out, please send me the keys ASAP. <a href="/scrapper.html" class="text-primary" style="cursor: pointer">Click Here</a> to learn the ans key extraction process on PC.
                     </p>
                     <!--<p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1.5rem; color: #ced334;">
                         Predict your percentile (based on approx 2k unique scores per shift) - <a href="/percentile-predictor.html" class="text-primary" style="text-decoration: none;">Click Here</a>
                     </p>-->
                     <p style="margin-bottom: 1rem;">
-                        <span style="font-weight: bold;">1.</span> <b>Don't take these scores too seriously</b>. It's NTA—they often make errors in the answer key, and this code may contain bugs that need to be fixed when identified.
+                        <span style="font-weight: bold;">1.</span> Select the session and exam shift, enter the <b>response sheet URL from NTA site</b> (starting with <code>cdn3.digialm.com</code>), and click "Evaluate" to calculate your score.
                     </p>
                     <p style="margin-bottom: 1rem;">
-                        <span style="font-weight: bold;">2.</span> Although you can upload an HTML file, I recommend <b>using the direct link</b> to your response sheet (starting with <code>cdn3.digialm.com</code>) to fetch score data efficiently.
+                        <span style="font-weight: bold;">2.</span> Use the <b>filter</b> button to view Correct/Incorrect questions by subject. <b>Click any row</b> to view analysis with images.
                     </p>
                     <p style="margin-bottom: 1rem;">
-                        <span style="font-weight: bold;">3.</span> If you encounter any issues evaluating your score then <b>DM me on Reddit </b>(<code>u/Novadrone16</code>) with your problem.
+                        <span style="font-weight: bold;">3.</span> Your score data is stored in your browser's <b>local storage</b> when you first use it. Next time, simply enter the response sheet URL, no need to enter the exam date.
                     </p>
                     <p style="margin-bottom: 1rem;">
-                        <span style="font-weight: bold;">4.</span> You can <b>click on the small images</b> to view the complete image.
-                    </p>
-                    <p class="text-center mt-3" style="font-size: 0.9rem; color: #aaa;">
-                        <a href="https://github.com/th3-w41k3r5/Jee2025ScoreCalculator" target="_blank" class="text-primary" style="text-decoration: none;">(Source Code)</a>
+                        <span style="font-weight: bold;">4.</span> Facing issues? <b>DM me on Reddit </b>(<code>u/Novadrone16</code>).
                     </p>
                 </div>
                 <div class="modal-footer justify-content-center">
@@ -106,45 +191,60 @@
             </div>
         </div>
     </div>
+    <div id="floatingReminder" class="alert alert-info alert-dismissible fade hide" role="alert" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1050;">
+        <span id="floatingReminderText">Click on any question row to view it completely.</span>
+        <button type="button" class="btn-close" aria-label="Close"></button>
+    </div>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">JEE 2025 Scorecard</h1>
-
-        <div 
-            id="infoButton" 
-            class="position-fixed" 
-            style="top: 20px; right: 20px; z-index: 1050; cursor: pointer;">
-            <i class="fas fa-info-circle" style="color: #e0e0e0; font-size: 24px;"></i>
+        <h1 class="text-center mb-4"><b>JEE 2025 Scorecard</b></h1>
+        <div id="hamburgerMenu" class="position-fixed" style="top: 20px; right: 20px; z-index: 1050; cursor: pointer;">
+            <i class="fas fa-bars" style="color: #e0e0e0; font-size: 24px;"></i>
         </div>
-
+        <div id="menuContent" class="position-fixed bg-dark p-3 rounded"
+            style="top: 60px; right: 20px; display: none; width: 230px; height: auto; border-radius: 10px; transition: opacity 0.2s ease, transform 0.2s ease; box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); z-index: 1052;">
+            <a href="#" id="menuInfo" class="d-flex align-items-center text-white text-decoration-none menu-item">
+                <i class="fas fa-info-circle me-2"></i> Info
+            </a>
+            <a href="#" id="menuStats" class="d-flex align-items-center text-secondary text-decoration-none mt-2 menu-item pe-none">
+                <i class="fas fa-chart-bar me-2"></i> Stats (Coming Soon!)
+            </a>
+            <hr class="text-white my-2">
+            <a href="https://github.com/th3-w41k3r5/Jee2025ScoreCalculator" target="_blank" class="d-flex align-items-center text-primary text-decoration-none menu-item" style="text-decoration: none;">
+                (Source Code)
+            </a>
+        </div>
         <form id="evaluationForm" class="mb-4">
             <div class="mb-3">
-                <label for="examDate" class="form-label">Select Exam Date and Shift:</label>
-                <select id="examDate" class="form-select bg-dark text-light">
-                    <optgroup label="Session 1">
-                        <option value="2025-01-22-shift-1">22nd Jan, Shift 1</option>
-                        <option value="2025-01-22-shift-2">22nd Jan, Shift 2</option>
-                        <option value="2025-01-23-shift-1">23rd Jan, Shift 1</option>
-                        <option value="2025-01-23-shift-2">23rd Jan, Shift 2</option>
-                        <option value="2025-01-24-shift-1">24th Jan, Shift 1</option>
-                        <option value="2025-01-24-shift-2">24th Jan, Shift 2</option>
-                        <option value="2025-01-28-shift-1">28th Jan, Shift 1</option>
-                        <option value="2025-01-28-shift-2">28th Jan, Shift 2</option>
-                        <option value="2025-01-29-shift-1">29th Jan, Shift 1</option>
-                        <option value="2025-01-29-shift-2">29th Jan, Shift 2</option>
-                        <option value="2025-01-30-shift-2">30th Jan, Shift 2 (B.Arch+B.Planning)</option>
-                    </optgroup>
-                    <!--<optgroup label="Session 2">
-                        <option value="">Exam Not Completed</option>
-                    </optgroup>-->
+                <label for="sessionSelect" class="form-label">Select Session:</label>
+                <select id="sessionSelect" class="form-select bg-dark text-light">
+                    <option value="January">January</option>
+                    <option value="April">April</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="answerSheetUrl" class="form-label">Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
-                <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
+                <label for="examDate" class="form-label">Select Exam Date and Shift:</label>
+                <select id="examDate" class="form-select bg-dark text-light"></select>
             </div>
 
-            <div class="mb-3 position-relative">
+            <div class="mb-3">
+                <label for="answerSheetUrl" class="form-label">Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
+                <div style="position: relative;">
+                    <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
+                    <div id="urlMaskOverlay" style="position: absolute; right: 0.1px; top: 0.9px; bottom: 1px; width: 37%;
+                                backdrop-filter: blur(5px);
+                                pointer-events: none;
+                                border-top-right-radius: 0.32rem;
+                                border-bottom-right-radius: 0.32rem;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                                padding-right: 5px;">
+                        <i id="toggleUrlMask" class="fas fa-eye-slash" style="cursor: pointer; color: #777; pointer-events: auto;"></i>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="mb-3 position-relative">
                 <label for="answerSheetFile" class="form-label"><b>OR</b> Upload Response Sheet html File:</label>
                 <div class="input-group">
                     <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
@@ -155,8 +255,7 @@
                         </svg>
                     </span>
                 </div>
-            </div>
-
+            </div>-->
             <button type="submit" class="btn btn-primary w-100">Evaluate</button>
         </form>
 
@@ -184,12 +283,32 @@
                 </div>
                 <p class="mt-2">Fetching data, please wait...</p>
             </div>
+        
             <div id="resultsSummary" class="mb-4"></div>
+        
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Detailed Question Evaluation</h3>
-                <button id="toggleIncorrect" class="btn btn-dark btn-sm border-light">Show Only Incorrect Questions</button>
+                <div class="dropdown">
+                    <button id="filterButton" class="btn btn-dark">
+                        <i class="fa fa-filter"></i> Filter
+                    </button>
+                    <div id="filterDropdown" class="dropdown-menu p-2">
+                        <strong>Status:</strong><br>
+                        <label><input type="checkbox" id="filterCorrect" checked> <i class="fas fa-check-circle fa-lg" style="color: #00a303;"></i> Correct</label>
+                        <label><input type="checkbox" id="filterIncorrect" checked> <i class="fas fa-times-circle fa-lg" style="color: #fb0404;"></i> Incorrect</label>
+                        <label><input type="checkbox" id="filterUnattempted" checked> <i class="far fa-circle fa-lg" style="color: #adb5bd;"></i> Unattempted</label>
+                        <label><input type="checkbox" id="filterDropped" checked> <i class="fas fa-minus-circle fa-lg" style="color: #adb5bd;"></i> Dropped</label>
+                        <hr>
+                        <strong>Subjects:</strong>
+                        <div id="subjectFilters"></div>
+                
+                        <button id="applyFilter" class="btn btn-primary btn-sm mt-2">OK</button>
+                        <button id="resetFilter" class="btn btn-secondary btn-sm mt-2">Reset</button>
+                    </div>
+                </div>
             </div>
-            <table class="table table-bordered table-dark">
+        
+            <div class="table-responsive"> <table class="table table-bordered table-dark table-hover">
                 <thead>
                     <tr>
                         <th>Question ID</th>
@@ -198,11 +317,47 @@
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="resultsTable"></tbody>
-            </table>
+                <tbody id="resultsTable" style="cursor: pointer; font-size: 0.9rem;"></tbody>
+              </table>
+            </div>
         </div>
+        
+        <div id="questionModal" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-center">
+                        <h5 id="modalQuestionTitle" class="modal-title text-dark"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="questionImage" src="" alt="Question Image" class="img-fluid mb-3 d-none">
+                        <div class="alert alert-secondary p-2"><strong>Your Answer:</strong> <span id="modalYourAnswer"></span></div>
+                        <div class="alert alert-secondary p-2"><strong>Correct Answer:</strong> <span id="modalCorrectAnswer"></span></div>
+                        <div class="alert p-2" id="modalEvaluation"></div>
+                    </div>
+                </div>
+            </div>
+        </div>        
     </div>
     <script src="anskey.js"></script>
-    <script src="script2.js"></script>
+    <script src="script3.js"></script>
+    <script>
+        const urlMaskOverlay = document.getElementById('urlMaskOverlay');
+        const toggleUrlMaskIcon = document.getElementById('toggleUrlMask');
+        let isMasked = true;  
+        toggleUrlMaskIcon.addEventListener('click', () => {
+            isMasked = !isMasked;
+            if (isMasked) {
+                urlMaskOverlay.style.backdropFilter = 'blur(5px)';
+                toggleUrlMaskIcon.classList.remove('fa-eye');
+                toggleUrlMaskIcon.classList.add('fa-eye-slash');
+            } else {
+                urlMaskOverlay.style.backdropFilter = 'blur(0)';
+                toggleUrlMaskIcon.classList.remove('fa-eye-slash');
+                toggleUrlMaskIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+    <!--<script disable-devtool-auto src='https://cdn.jsdelivr.net/npm/disable-devtool'></script>-->
 </body>
 </html>

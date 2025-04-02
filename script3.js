@@ -1,18 +1,52 @@
+//few features added like filter, question modal, works for all sessions and all paper of JEE Main (v3) [ENABLED]
+//menu, modal
 document.addEventListener("DOMContentLoaded", () => {
     const initialModal = new bootstrap.Modal(document.getElementById("initialModal"));
-
     initialModal.show();
 
-    const infoButton = document.getElementById("infoButton");
-    infoButton.addEventListener("click", () => {
-        initialModal.show();
+    const hamburgerMenu = document.getElementById("hamburgerMenu");
+    const menuContent = document.getElementById("menuContent");
+    const menuInfo = document.getElementById("menuInfo");
+
+    hamburgerMenu.addEventListener("click", () => {
+        if (menuContent.classList.contains("show")) {
+            menuContent.classList.remove("show");
+            setTimeout(() => {
+                menuContent.style.display = "none";
+            }, 200);
+        } else {
+            menuContent.style.display = "block";
+            setTimeout(() => {
+                menuContent.classList.add("show");
+            }, 10);
+        }
     });
+
+    document.addEventListener("click", (event) => {
+        if (!hamburgerMenu.contains(event.target) && !menuContent.contains(event.target)) {
+            menuContent.classList.remove("show");
+            setTimeout(() => {
+                menuContent.style.display = "none";
+            }, 200);
+        }
+    });
+
+    menuInfo.addEventListener("click", (event) => {
+        event.preventDefault();
+        initialModal.show();
+        menuContent.classList.remove("show");
+        setTimeout(() => {
+            menuContent.style.display = "none";
+        }, 200);
+    });
+
 });
 
-document.getElementById("removeFile").addEventListener("click", () => {
-    const fileInput = document.getElementById("answerSheetFile");
-    fileInput.value = "";
-});
+
+//document.getElementById("removeFile").addEventListener("click", () => {
+   // const fileInput = document.getElementById("answerSheetFile");
+    //fileInput.value = "";
+//});
 
 
 async function fetchHtmlThroughProxy(url) {
@@ -127,7 +161,7 @@ function parseAnswerSheetHTML(htmlContent) {
     };
 }
 
-
+//Evaluate button
 document.getElementById("evaluationForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -137,10 +171,10 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     const selectedExamDate = document.getElementById("examDate").value;
     let storageKey, htmlContent;
 
-    if (urlInput && fileInput.files.length > 0) {
-        alert("Please use only one input method: either upload a file or enter a URL.");
-        return;
-    }
+    //if (urlInput && fileInput.files.length > 0) {
+        //alert("Please use only one input method: either upload a file or enter a URL.");
+        //return;
+    //}
 
     if (typeof window.answerKeysVersion === "undefined") {
         alert("Answer keys version is not available. Please check anskey.js.");
@@ -153,15 +187,8 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
             return;
         }
         storageKey = generateStorageKey(urlInput);
-    } else if (fileInput.files.length) {
-        const file = fileInput.files[0];
-        if (!file.name.toLowerCase().endsWith(".html")) {
-            alert("Invalid file. Only .html files are allowed.");
-            return;
-        }
-        storageKey = await hashFile(file);
     } else {
-        alert("Please provide a file or URL.");
+        alert("Please provide a URL.");
         return;
     }
 
@@ -181,10 +208,7 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
     document.getElementById("resultsSection").classList.add("d-none");
 
     try {
-        if (fileInput.files.length) {
-            const file = fileInput.files[0];
-            htmlContent = await file.text();
-        } else if (urlInput) {
+        if (urlInput) {
             htmlContent = await fetchHtmlThroughProxy(urlInput);
         }
 
@@ -247,7 +271,6 @@ document.getElementById("evaluationForm").addEventListener("submit", async funct
 });
 
 
-
 function evaluateAnswers(userAnswers, answerKey) {
     const results = [];
     let correctCount = 0, incorrectCount = 0, attemptedCount = 0, droppedCount = 0;
@@ -264,6 +287,7 @@ function evaluateAnswers(userAnswers, answerKey) {
         const userAnswerImg = userAnswerDetails?.option_images[userAnswerId] || null;
         const correctAnswerImg = userAnswerDetails?.option_images[correctAnswerId] || null;
         const questionImg = userAnswerDetails?.question_img || null;
+        const questionType = userAnswerDetails?.question_type || "MCQ";
 
         let status = "Unattempted";
         let subject = userAnswerDetails?.subject?.toLowerCase() || "unknown";
@@ -281,14 +305,30 @@ function evaluateAnswers(userAnswers, answerKey) {
             subjectStats[subject].attempted++;
 
             const correctAnswers = correctAnswerId.includes(",") ? correctAnswerId.split(",") : [correctAnswerId];
-            if (correctAnswers.includes(userAnswerId)) {
-                correctCount++;
-                subjectStats[subject].correct++;
-                status = "Correct";
-            } else {
-                incorrectCount++;
-                subjectStats[subject].incorrect++;
-                status = "Incorrect";
+
+            if (questionType === "SA") {  //Integer Type
+                const normalizedUserAnswer = parseFloat(userAnswerId);
+                const normalizedCorrectAnswers = correctAnswers.map(ans => parseFloat(ans));
+
+                if (normalizedCorrectAnswers.includes(normalizedUserAnswer)) {
+                    correctCount++;
+                    subjectStats[subject].correct++;
+                    status = "Correct";
+                } else {
+                    incorrectCount++;
+                    subjectStats[subject].incorrect++;
+                    status = "Incorrect";
+                }
+            } else {  //MCQs
+                if (correctAnswers.includes(userAnswerId)) {
+                    correctCount++;
+                    subjectStats[subject].correct++;
+                    status = "Correct";
+                } else {
+                    incorrectCount++;
+                    subjectStats[subject].incorrect++;
+                    status = "Incorrect";
+                }
             }
         }
 
@@ -299,12 +339,12 @@ function evaluateAnswers(userAnswers, answerKey) {
             userAnswerImg,
             correctAnswerId,
             correctAnswerImg,
-            status
+            status,
+            subject
         });
     }
 
     const totalScore = (correctCount * 4) - (incorrectCount * 1) + (droppedCount * 4);
-
     return {
         results,
         correctCount,
@@ -313,18 +353,142 @@ function evaluateAnswers(userAnswers, answerKey) {
         attemptedCount,
         totalQuestions: Object.keys(answerKey).length,
         totalScore,
-        subjectStats
+        subjectStats,
+        selectedExamDate: document.getElementById("examDate").value
     };
 }
+
 
 function capitalize(subject) {
     return subject.charAt(0).toUpperCase() + subject.slice(1);
 }
 
-function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalScore, subjectStats }) {
+
+function populateSubjects() {
+    const subjectContainer = document.getElementById("subjectFilters");
+    const subjects = new Set();
+    const rows = document.querySelectorAll("#resultsTable tr");
+    rows.forEach(row => {
+        const subject = row.dataset.subject;
+        if (subject) {
+            subjects.add(subject);
+        }
+    });
+
+    subjectContainer.innerHTML = "";
+
+    if (subjects.size === 0) {
+        subjectContainer.innerHTML = "<em>No subjects available</em>";
+        return;
+    }
+
+    const subjectIcons = {
+        "maths": "fas fa-calculator",
+        "physics": "fas fa-bolt",
+        "chemistry": "fas fa-flask",
+        "aptitude": "fas fa-brain",
+        "planning": "fas fa-map-marked-alt"
+    };
+    subjects.forEach(subject => {
+        const capitalizedSubject = subject.charAt(0).toUpperCase() + subject.slice(1);
+        const iconClass = subjectIcons[subject.toLowerCase()] || "fas fa-book";
+        const div = document.createElement("div");
+        div.innerHTML = `<label><input type="checkbox" class="subject-filter" data-subject="${subject}" checked><i class="${iconClass}"></i> ${capitalizedSubject}</label>`;
+        subjectContainer.appendChild(div);
+    });
+}
+
+//filter
+document.addEventListener("DOMContentLoaded", function () {
+    const filterButton = document.getElementById("filterButton");
+    const filterDropdown = document.getElementById("filterDropdown");
+    const resetFilter = document.getElementById("resetFilter");
+    const resultsTable = document.getElementById("resultsTable");
+
+    document.getElementById("filterButton").addEventListener("click", function () {
+        const dropdown = document.getElementById("filterDropdown");
+    
+        if (dropdown.classList.contains("show")) {
+            dropdown.classList.remove("show");
+            setTimeout(() => {
+                dropdown.style.display = "none";
+            }, 200);
+        } else {
+            const rect = dropdown.getBoundingClientRect();
+            dropdown.style.right = rect.right > window.innerWidth ? "0px" : "auto";
+            dropdown.style.left = "-130px";
+            dropdown.style.top = "50px";
+            dropdown.style.display = "block";
+            setTimeout(() => {
+                dropdown.classList.add("show");
+            }, 10);
+        }
+    });
+       
+    document.addEventListener("click", function (event) {
+        if (!filterButton.contains(event.target) && !filterDropdown.contains(event.target)) {
+            filterDropdown.classList.remove("show");
+        }
+    });
+
+    document.getElementById("applyFilter").addEventListener("click", function () {
+        const showCorrect = document.getElementById("filterCorrect").checked;
+        const showIncorrect = document.getElementById("filterIncorrect").checked;
+        const showUnattempted = document.getElementById("filterUnattempted").checked;
+        const showDropped = document.getElementById("filterDropped").checked;
+
+        const selectedSubjects = Array.from(document.querySelectorAll(".subject-filter:checked"))
+             .map(checkbox => checkbox.dataset.subject);
+
+        const rows = document.getElementById("resultsTable").querySelectorAll("tr");
+        rows.forEach(row => {
+            const isCorrect = row.classList.contains("table-success");
+            const isIncorrect = row.classList.contains("table-danger");
+            const isDropped = row.classList.contains("table-warning");
+            const isUnattempted = !isCorrect && !isIncorrect && !isDropped;
+            const subject = row.dataset.subject;
+    
+            const shouldShowByStatus =
+                (showCorrect && isCorrect) ||
+                (showIncorrect && isIncorrect) ||
+                (showUnattempted && isUnattempted) ||
+                (showDropped && isDropped);
+
+            const shouldShowBySubject =
+                selectedSubjects.length === 0 || selectedSubjects.includes(subject);
+            
+          if (shouldShowByStatus && shouldShowBySubject) {
+             row.style.display = "";
+          } else {
+             row.style.display = "none";
+          }  
+        });
+    
+        document.getElementById("filterDropdown").classList.remove("show");
+    });
+    
+    resetFilter.addEventListener("click", function () {
+        document.querySelectorAll("#filterDropdown input[type='checkbox']").forEach(checkbox => {
+            checkbox.checked = true;
+        });
+
+        resultsTable.querySelectorAll("tr").forEach(row => {
+            row.style.display = "";
+        });
+    });
+
+    function injectSubjectsAfterEvaluation(subjectStats) {
+        populateSubjects(subjectStats);
+    }
+
+    window.injectSubjectsAfterEvaluation = injectSubjectsAfterEvaluation;
+});
+
+
+function displayResults({ results, correctCount, incorrectCount, droppedCount, attemptedCount, totalScore, subjectStats, selectedExamDate}) {
     const resultsTable = document.getElementById("resultsTable");
     const summarySection = document.getElementById("resultsSummary");
-
+    const ExamDateSelected = selectedExamDate.split('-')[2] + 's' + selectedExamDate.split('-')[4];
     const subjects = Object.keys(subjectStats).filter(subject => subjectStats[subject].attempted > 0);
 
     let tableHeaders = `<th></th><th>Total</th>`;
@@ -368,8 +532,11 @@ function displayResults({ results, correctCount, incorrectCount, droppedCount, a
     tableRows += `</tr>`;
 
     summarySection.innerHTML = `
-        <h3>Your Score: ${totalScore}</h3>
-        <table class="table table-bordered">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Your Score: <span style="font-size: 1.7rem; font-weight: bold;">${totalScore}</span></h3>
+            <h3><span style="font-size: 1.5rem;">${ExamDateSelected}</span></h3>
+        </div>
+        <table class="table table-bordered table-dark">
             <thead><tr>${tableHeaders}</tr></thead>
             <tbody>${tableRows}</tbody>
         </table>
@@ -377,53 +544,110 @@ function displayResults({ results, correctCount, incorrectCount, droppedCount, a
 
     resultsTable.innerHTML = "";
 
-    results.forEach(({ questionId, questionImg, correctAnswerId, correctAnswerImg, userAnswerId, userAnswerImg, status }) => {
-        const questionImgHTML = questionImg ? `<img src="${questionImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${questionImg}', '_blank');">` : '';
-        const correctImgHTML = correctAnswerImg ? `<img src="${correctAnswerImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${correctAnswerImg}', '_blank');">` : '';
-        const userImgHTML = userAnswerImg ? `<img src="${userAnswerImg}" style="width:50px;height:50px;cursor:pointer;" onclick="window.open('${userAnswerImg}', '_blank');">` : '';
+    results.forEach(({ questionId, questionImg, correctAnswerId, correctAnswerImg, userAnswerId, userAnswerImg, subject, status }) => {
+        const row = document.createElement("tr");
+        row.className = status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : status === 'Dropped' ? 'table-warning' : '';
 
-        const row = `
-            <tr class="${status === 'Correct' ? 'table-success' : status === 'Incorrect' ? 'table-danger' : status === 'Dropped' ? 'table-warning' : ''}">
-                <td>${questionId}<br>${questionImgHTML}</td>
-                <td>${userAnswerId || ''}<br>${userImgHTML}</td>
-                <td>${correctAnswerId || ''}<br>${correctImgHTML}</td>
-                <td>${status}</td>
-            </tr>`;
-        resultsTable.innerHTML += row;
+        row.dataset.subject = subject ? capitalize(subject) : "Unknown";
+        row.dataset.questionId = questionId;
+        row.dataset.questionImg = questionImg || "";
+        row.dataset.userAnswerId = userAnswerId || "No Answer";  
+        row.dataset.correctAnswerId = correctAnswerId || "N/A";  
+        row.dataset.userAnswerImg = userAnswerImg || "";  
+        row.dataset.correctAnswerImg = correctAnswerImg || "";  
+        row.dataset.status = status;
+
+        row.innerHTML = `
+            <td>${questionId}<br><span style="font-size:0.8rem;">(Click To View)</span></td>
+            <td>${userAnswerId || ''}<br>${userAnswerImg ? `<img src="${userAnswerImg}" style="width:50px;height:50px;cursor:pointer;">` : ''}</td>
+            <td>${correctAnswerId || ''}<br>${correctAnswerImg ? `<img src="${correctAnswerImg}" style="width:50px;height:50px;cursor:pointer;">` : ''}</td>
+            <td>${status}</td>
+        `;
+
+        row.addEventListener("click", function () {
+            openQuestionModal(this.dataset);
+        });
+
+        resultsTable.appendChild(row);
     });
 
     document.getElementById("resultsSection").classList.remove("d-none");
+    populateSubjects();
+    const floatingReminder = document.getElementById("floatingReminder");
+    const floatingReminderText = document.getElementById("floatingReminderText");
+
+    const reminders = [
+        "Click on any question row to view it completely.",
+        "You can use the filter button to see Correct/Incorrect answers separately subject-wise.",
+    ];
+
+    const showReminder = (index) => {
+        if (index < reminders.length) {
+            const delay = index === 0 ? 2000 : 3000;
+
+            setTimeout(() => {
+                floatingReminderText.textContent = reminders[index];
+                floatingReminder.classList.remove("hide");
+                floatingReminder.classList.add("show", "show-up");
+
+                const closeButton = floatingReminder.querySelector('.btn-close');
+                const closeHandler = (event) => {
+                    event.preventDefault();
+                    floatingReminder.classList.remove("show", "show-up");
+                    floatingReminder.classList.add("hide");
+                    setTimeout(() => {
+                        showReminder(index + 1);
+                    }, 3000);
+                    closeButton.removeEventListener('click', closeHandler);
+                };
+                if (closeButton) {
+                    closeButton.addEventListener('click', closeHandler);
+                }
+
+            }, delay);
+        } else {
+            // setTimeout(() => {
+            //     floatingReminder.classList.remove("show", "show-up");
+            //     floatingReminder.classList.add("hide");
+            // }, 2000);
+        }
+    };
+    showReminder(0, 2000);
 }
 
 
-document.getElementById("toggleIncorrect").addEventListener("click", function () {
-    const button = this;
-    const resultsTable = document.getElementById("resultsTable");
-    const rows = resultsTable.querySelectorAll("tr");
+function openQuestionModal(data) {
+    const modal = new bootstrap.Modal(document.getElementById("questionModal"));
+    const subjectTitle = data.subject && data.subject !== "Unknown" ? capitalize(data.subject.trim()) : "Subject Not Available";
+    document.getElementById("modalQuestionTitle").textContent = `${subjectTitle} - ${data.questionId}`;
 
-    if (button.textContent === "Show Only Incorrect Questions") {
-        rows.forEach(row => {
-            if (!row.classList.contains("table-danger")) {
-                row.style.display = "none";
-            }
-        });
-        button.textContent = "Show All Questions";
-    } else {
-        rows.forEach(row => {
-            row.style.display = "";
-        });
-        button.textContent = "Show Only Incorrect Questions";
-    }
-});
+    document.getElementById("modalYourAnswer").innerHTML = data.userAnswerImg 
+        ? `<img src="${data.userAnswerImg}" class="option-img mw-100">` 
+        : `<span class="answer-text">${data.userAnswerId}</span>`;
+
+    document.getElementById("modalCorrectAnswer").innerHTML = data.correctAnswerImg 
+        ? `<img src="${data.correctAnswerImg}" class="option-img mw-100">` 
+        : `<span class="answer-text">${data.correctAnswerId}</span>`;
+
+    const questionImage = document.getElementById("questionImage");
+    questionImage.src = data.questionImg;
+    questionImage.classList.toggle("d-none", !data.questionImg);
+
+    const modalEvaluation = document.getElementById("modalEvaluation");
+    modalEvaluation.textContent = `Status: ${data.status}`;
+    modalEvaluation.className = `alert ${data.status === 'Correct' ? 'alert-success' : data.status === 'Incorrect' ? 'alert-danger' : 'alert-warning'}`;
+
+    modal.show();
+}
 
 
 function getSubjectFromQuestionId(questionId, subject) {
     return subject;
 }
 
+
 // storing JUST score data in cf db. May be will use it to determine estimated percentile if enough scores per shift is collected
 async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore) {
-
     const isPCM = subjectStats.physics?.attempted > 0 || subjectStats.chemistry?.attempted > 0;
     const isMathsAptitude = subjectStats.maths?.attempted > 0 && subjectStats.aptitude?.attempted > 0;
     const isMathsAptitudePlanning = isMathsAptitude && subjectStats.planning?.attempted > 0;
@@ -435,39 +659,34 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
             physics: isPCM 
                 ? (subjectStats.physics?.correct * 4 - subjectStats.physics?.incorrect + subjectStats.physics?.dropped * 4) 
                 : "-",
-    
             chemistry: isPCM 
                 ? (subjectStats.chemistry?.correct * 4 - subjectStats.chemistry?.incorrect + subjectStats.chemistry?.dropped * 4) 
                 : "-",
-    
             maths: subjectStats.maths?.attempted > 0 
                 ? (subjectStats.maths.correct * 4 - subjectStats.maths.incorrect + subjectStats.maths.dropped * 4) 
                 : "-",
-    
             aptitude: isMathsAptitude 
                 ? (subjectStats.aptitude?.correct * 4 - subjectStats.aptitude?.incorrect + subjectStats.aptitude?.dropped * 4) 
                 : "-",
-    
             planning: isMathsAptitudePlanning 
                 ? (subjectStats.planning?.correct * 4 - subjectStats.planning?.incorrect + subjectStats.planning?.dropped * 4) 
                 : "-",
-    
             totalScore,
         },
     };
 
     saveToLocalStorage(uniqueId, payload);
 
-    try {
-        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
-            "https://score-worker.iitjeepritam.workers.dev/"
-        )}`;
+    const workerUrl = examDate.startsWith("2025-04")
+        ? "https://score-worker2.iitjeepritam.workers.dev/"
+        : "https://score-worker.iitjeepritam.workers.dev/";
 
+    const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(workerUrl)}`;
+
+    try {
         const response = await fetch(proxyUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });
 
@@ -478,6 +697,7 @@ async function storeEvaluationData(uniqueId, examDate, subjectStats, totalScore)
         console.error("Error storing evaluation score:", error.message);
     }
 }
+
 
 //giving unique id to each user
 function generateUniqueId() {
@@ -494,14 +714,18 @@ function saveToLocalStorage(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
+
 function fetchFromLocalStorage(key) {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
 }
 
+
 function generateStorageKey(input) {
-    return btoa(input); // Base64 encode for simplicity
+    const normalizedUrl = input.split('#')[0];
+    return btoa(normalizedUrl); // Base64 encode for simplicity
 }
+
 
 async function hashFile(file) {
     const arrayBuffer = await file.arrayBuffer();
@@ -511,4 +735,51 @@ async function hashFile(file) {
 }
 
 
-//session2 - https://score-worker2.iitjeepritam.workers.dev/
+//session2 dates update
+document.addEventListener("DOMContentLoaded", () => {
+    const sessionSelect = document.getElementById("sessionSelect");
+    const examDateSelect = document.getElementById("examDate");
+
+    const januaryDates = [
+        { value: "2025-01-22-shift-1", text: "22nd Jan, Shift 1" },
+        { value: "2025-01-22-shift-2", text: "22nd Jan, Shift 2" },
+        { value: "2025-01-23-shift-1", text: "23rd Jan, Shift 1" },
+        { value: "2025-01-23-shift-2", text: "23rd Jan, Shift 2" },
+        { value: "2025-01-24-shift-1", text: "24th Jan, Shift 1" },
+        { value: "2025-01-24-shift-2", text: "24th Jan, Shift 2" },
+        { value: "2025-01-28-shift-1", text: "28th Jan, Shift 1" },
+        { value: "2025-01-28-shift-2", text: "28th Jan, Shift 2" },
+        { value: "2025-01-29-shift-1", text: "29th Jan, Shift 1" },
+        { value: "2025-01-29-shift-2", text: "29th Jan, Shift 2" },
+        { value: "2025-01-30-shift-2", text: "30th Jan, Shift 2 (B.Arch+B.Planning)"}
+    ];
+
+    const aprilDates = [
+        //{ value: "2025-04-02-shift-1", text: "2nd April, Shift 1" },
+        //{ value: "2025-04-02-shift-2", text: "2nd April, Shift 2" },
+        //{ value: "2025-04-03-shift-1", text: "3rd April, Shift 1" },
+        //{ value: "2025-04-03-shift-2", text: "3rd April, Shift 2" },
+        //{ value: "2025-04-04-shift-1", text: "4th April, Shift 1" },
+        //{ value: "2025-04-04-shift-2", text: "4th April, Shift 2" },
+        //{ value: "2025-04-07-shift-1", text: "7th April, Shift 1" },
+        //{ value: "2025-04-07-shift-2", text: "7th April, Shift 2" },
+        //{ value: "2025-04-08-shift-2", text: "8th April, Shift 2" }
+    ];
+
+    function updateExamDates() {
+        const selectedSession = sessionSelect.value;
+        const dates = selectedSession === "January" ? januaryDates : aprilDates;
+
+        examDateSelect.innerHTML = "";
+        dates.forEach(date => {
+            const option = document.createElement("option");
+            option.value = date.value;
+            option.textContent = date.text;
+            examDateSelect.appendChild(option);
+        });
+    }
+
+    sessionSelect.addEventListener("change", updateExamDates);
+    updateExamDates();
+});
+
