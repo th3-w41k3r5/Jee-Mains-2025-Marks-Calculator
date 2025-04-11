@@ -756,7 +756,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const aprilDates = [
         //{ value: "2025-04-02-shift-1", text: "2nd April, Shift 1" },
-        //{ value: "2025-04-02-shift-2", text: "2nd April, Shift 2" },
+        { value: "2025-04-02-shift-2", text: "2nd April, Shift 2" },
         //{ value: "2025-04-03-shift-1", text: "3rd April, Shift 1" },
         { value: "2025-04-03-shift-2", text: "3rd April, Shift 2" },
         { value: "2025-04-04-shift-1", text: "4th April, Shift 1" },
