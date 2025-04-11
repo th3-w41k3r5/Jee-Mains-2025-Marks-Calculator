@@ -760,7 +760,7 @@ document.addEventListener("DOMContentLoaded", () => {
         //{ value: "2025-04-03-shift-1", text: "3rd April, Shift 1" },
         { value: "2025-04-03-shift-2", text: "3rd April, Shift 2" },
         { value: "2025-04-04-shift-1", text: "4th April, Shift 1" },
-        //{ value: "2025-04-04-shift-2", text: "4th April, Shift 2" },
+        { value: "2025-04-04-shift-2", text: "4th April, Shift 2" },
         //{ value: "2025-04-07-shift-1", text: "7th April, Shift 1" },
         { value: "2025-04-07-shift-2", text: "7th April, Shift 2" },
         { value: "2025-04-08-shift-2", text: "8th April, Shift 2" }
