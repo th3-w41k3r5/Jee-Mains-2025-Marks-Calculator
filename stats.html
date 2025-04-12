@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats - J2025Scorecard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #1a202c;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        .container-custom {
+            background: #1F2937;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #374151;
+            text-align: left;
+        }
+        th {
+            background: #374151;
+        }
+        tr:hover {
+            background: #2D3748;
+        }
+        .toggle-btn {
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <h1 class="text-center mb-4"><strong>Stats - J2025Scorecard</strong></h1>
+
+    <p class="text-center mb-0">Last Updated: <span id="lastUpdated">Loading...</span></p>
+    <p class="text-center mt-1 text-primary" style="font-size: small;">(Data updated hourly)</p>
+
+    <div class="container-custom text-center p-3">
+        <p class="fs-5 fw-bold">Total Scores Recorded: <span id="totalScores" class="text-info">Loading...</span></p>
+        <p class="fs-6">Active Users (Last 30 min): <span id="activeUsers" class="text-info">Loading...</span></p>
+    </div>
+
+    <div class="container-custom">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fs-4">Median & Avg Scores</h2>
+            <div>
+                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('medianAvgTableContainer', 'medianAvgChartContainer')"></i>
+                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('medianAvgChartContainer', 'medianAvgTableContainer')"></i>
+            </div>
+        </div>
+
+        <div id="medianAvgTableContainer">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Exam Date</th>
+                            <th>Scores Recorded</th>
+                            <th>Median</th>
+                            <th>Avg</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medianAvgTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="medianAvgChartContainer" class="d-none">
+            <canvas id="medianAvgChart"></canvas>
+        </div>
+        <div class="mt-2">
+            <small class="text-white">
+                <strong>Note:</strong> The median score is calculated based on the unique scores recorded.
+            </small>
+        </div>
+    </div>
+
+    <div class="container-custom">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fs-4">Above Score Ranges</h2>
+            <div id="aboveScoreChartControls" class="d-none">
+                <select id="aboveScoreSelect1">
+                    <option value="above140">Above 140</option>
+                    <option value="above180">Above 180</option>
+                    <option value="above200">Above 200</option>
+                    <option value="above230">Above 230</option>
+                    <option value="above250">Above 250</option>
+                </select>
+                <select id="aboveScoreSelect2">
+                    <option value="above180">Above 180</option>
+                    <option value="above140">Above 140</option>
+                    <option value="above200">Above 200</option>
+                    <option value="above230">Above 230</option>
+                    <option value="above250">Above 250</option>
+                </select>
+            </div>
+            <div>
+                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('aboveScoreTableContainer', 'aboveScoreChartContainer')"></i>
+                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('aboveScoreChartContainer', 'aboveScoreTableContainer')"></i>
+            </div>
+        </div>
+
+        <div id="aboveScoreTableContainer">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Exam Date</th>
+                            <th>Scores Recorded</th>
+                            <th>Above 140</th>
+                            <th>Above 180</th>
+                            <th>Above 200</th>
+                            <th>Above 230</th>
+                            <th>Above 250</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aboveScoreTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="aboveScoreChartContainer" class="d-none">
+            <canvas id="aboveScoreChart"></canvas>
+        </div>
+    </div>
+
+    <div class="container-custom">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fs-4">Specific Score Ranges</h2>
+            <div id="specificRangeChartControls" class="d-none">
+                <select id="specificRangeSelect1">
+                    <option value="range_140_160">140-160</option>
+                    <option value="range_180_200">180-200</option>
+                    <option value="range_200_230">200-230</option>
+                    <option value="range_250_above">250+</option>
+                </select>
+                <select id="specificRangeSelect2">
+                    <option value="range_180_200">180-200</option>
+                    <option value="range_140_160">140-160</option>
+                    <option value="range_200_230">200-230</option>
+                    <option value="range_250_above">250+</option>
+                </select>
+            </div>
+            <div>
+                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('specificRangeTableContainer', 'specificRangeChartContainer')"></i>
+                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('specificRangeChartContainer', 'specificRangeTableContainer')"></i>
+            </div>
+        </div>
+
+        <div id="specificRangeTableContainer">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Exam Date</th>
+                            <th>Scores Recorded</th>
+                            <th>140-160</th>
+                            <th>180-200</th>
+                            <th>200-230</th>
+                            <th>250+</th>
+                        </tr>
+                    </thead>
+                    <tbody id="specificRangeTable"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="specificRangeChartContainer" class="d-none">
+            <canvas id="specificRangeChart"></canvas>
+        </div>
+    </div>
+
+    <footer>
+        TOTAL ACTIVE USERS - <span id="totalUsers" class="text-info">Loading...</span> <span style="font-size: small;">(Last 90 days)</span> <br>
+        By - <span class="text-primary">u/Novadrone16</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function fetchData() {
+            const Url = "https://stats-api.iitjeepritam.workers.dev/stats";
+            const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(Url)}`;
+    
+            try {
+                const response = await fetch(proxyUrl);
+                //const response = await fetch("/.netlify/functions/fetchStats");
+
+                const stats = await response.json();
+    
+                const apiTime = stats.lastUpdated;
+    
+                const year = apiTime.substring(0, 4);
+                const month = apiTime.substring(5, 7);
+                const day = apiTime.substring(8, 10);
+                const hour = apiTime.substring(11, 13);
+                const minute = apiTime.substring(14, 16);
+                const hour12 = (parseInt(hour) % 12) || 12;
+                const ampm = parseInt(hour) >= 12 ? 'PM' : 'AM';
+    
+                const formattedDate = `${day}/${month}/${year} - ${hour12.toString().padStart(2, '0')}:${minute.padStart(2, '0')} ${ampm}`;
+    
+                document.getElementById("lastUpdated").textContent = formattedDate;
+                document.getElementById("totalScores").textContent = stats.totalCountAllDates;
+                document.getElementById("activeUsers").textContent = stats.analytics.realTime.activeUsersLast30Min || "0";
+                document.getElementById("totalUsers").textContent = stats.analytics.last90Days.totalUsers;
+    
+                const examStats = stats.examStats;
+    
+                const examDates = Object.keys(examStats).map(exam => {
+                    const parts = exam.split('-');
+                    const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                    const date = new Date(dateStr);
+                    const shift = parts.length > 4 ? parseInt(parts[4]) : 1;
+                    return { exam, date, shift };
+                });
+
+                examDates.sort((a, b) => {
+                    const dateComparison = a.date - b.date;
+                    return dateComparison !== 0 ? dateComparison : a.shift - b.shift;
+                });
+
+                let medianAvgHtml = "", aboveScoreHtml = "", specificRangeHtml = "";
+    
+                const examLabels = examDates.map(item => item.exam);
+                const medianData = examDates.map(({ exam }) => examStats[exam].median);
+                const averageData = examDates.map(({ exam }) => examStats[exam].average);
+    
+                const above140Data = examDates.map(({ exam }) => examStats[exam].above140);
+                const above180Data = examDates.map(({ exam }) => examStats[exam].above180);
+                const above200Data = examDates.map(({ exam }) => examStats[exam].above200);
+                const above230Data = examDates.map(({ exam }) => examStats[exam].above230);
+                const above250Data = examDates.map(({ exam }) => examStats[exam].above250);
+    
+                const range140_160Data = examDates.map(({ exam }) => examStats[exam].range_140_160);
+                const range180_200Data = examDates.map(({ exam }) => examStats[exam].range_180_200);
+                const range200_230Data = examDates.map(({ exam }) => examStats[exam].range_200_230);
+                const range250_aboveData = examDates.map(({ exam }) => examStats[exam].range_250_above);
+    
+                examDates.forEach(({ exam }) => {
+                    const data = examStats[exam];
+    
+                    medianAvgHtml += `
+                        <tr>
+                            <td>${exam}</td>
+                            <td>${data.totalCount}</td>
+                            <td>${data.median}</td>
+                            <td>${data.average.toFixed(2)}</td>
+                        </tr>`;
+    
+                    aboveScoreHtml += `
+                        <tr>
+                            <td>${exam}</td>
+                            <td>${data.totalCount}</td>
+                            <td>${data.above140}</td>
+                            <td>${data.above180}</td>
+                            <td>${data.above200}</td>
+                            <td>${data.above230}</td>
+                            <td>${data.above250}</td>
+                        </tr>`;
+    
+                    specificRangeHtml += `
+                        <tr>
+                            <td>${exam}</td>
+                            <td>${data.totalCount}</td>
+                            <td>${data.range_140_160}</td>
+                            <td>${data.range_180_200}</td>
+                            <td>${data.range_200_230}</td>
+                            <td>${data.range_250_above}</td>
+                        </tr>`;
+                });
+    
+                document.getElementById("medianAvgTable").innerHTML = medianAvgHtml;
+                document.getElementById("aboveScoreTable").innerHTML = aboveScoreHtml;
+                document.getElementById("specificRangeTable").innerHTML = specificRangeHtml;
+    
+                createChart("medianAvgChart", examLabels, medianData, averageData, "Median Scores", "Average Scores");
+                window.aboveScoreChart = createAboveScoreChart("aboveScoreChart", examLabels, above140Data, above180Data, "Above 140", "Above 180");
+                window.specificRangeChart = createSpecificRangeChart("specificRangeChart", examLabels, range140_160Data, range180_200Data, "140-160", "180-200");
+    
+                document.getElementById("aboveScoreSelect1").addEventListener("change", () => updateAboveScoreChart(examLabels, examStats));
+                document.getElementById("aboveScoreSelect2").addEventListener("change", () => updateAboveScoreChart(examLabels, examStats));
+                document.getElementById("specificRangeSelect1").addEventListener("change", () => updateSpecificRangeChart(examLabels, examStats));
+                document.getElementById("specificRangeSelect2").addEventListener("change", () => updateSpecificRangeChart(examLabels, examStats));
+    
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+    
+        function toggleView(showId, hideId) {
+            document.getElementById(showId).classList.remove("d-none");
+            document.getElementById(hideId).classList.add("d-none");
+    
+            if (showId === "aboveScoreChartContainer") {
+                document.getElementById("aboveScoreChartControls").classList.remove("d-none");
+            } else {
+                document.getElementById("aboveScoreChartControls").classList.add("d-none");
+            }
+    
+            if (showId === "specificRangeChartContainer") {
+                document.getElementById("specificRangeChartControls").classList.remove("d-none");
+            } else {
+                document.getElementById("specificRangeChartControls").classList.add("d-none");
+            }
+        }
+    
+        function createChart(canvasId, labels, data1, data2, label1, label2) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label1,
+                        data: data1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: label2,
+                        data: data2,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    
+        function createAboveScoreChart(canvasId, labels, data1, data2, label1, label2) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+             const newChart =  new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label1,
+                        data: data1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: label2,
+                        data: data2,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                     responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            return newChart;
+        }
+    
+        function createSpecificRangeChart(canvasId, labels, data1, data2, label1, label2) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const newChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label1,
+                        data: data1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: label2,
+                        data: data2,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                     responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            return newChart;
+        }
+    
+        function updateAboveScoreChart(labels, examStats) {
+            const select1Value = document.getElementById("aboveScoreSelect1").value;
+            const select2Value = document.getElementById("aboveScoreSelect2").value;
+    
+            const data1 = labels.map(exam => examStats[exam][select1Value]);
+            const data2 = labels.map(exam => examStats[exam][select2Value]);
+    
+            const label1Text = document.getElementById("aboveScoreSelect1").options[document.getElementById("aboveScoreSelect1").selectedIndex].text;
+            const label2Text = document.getElementById("aboveScoreSelect2").options[document.getElementById("aboveScoreSelect2").selectedIndex].text;
+    
+            window.aboveScoreChart.data.datasets[0].data = data1;
+            window.aboveScoreChart.data.datasets[0].label = label1Text;
+            window.aboveScoreChart.data.datasets[1].data = data2;
+            window.aboveScoreChart.data.datasets[1].label = label2Text;
+            window.aboveScoreChart.update();
+        }
+    
+        function updateSpecificRangeChart(labels, examStats) {
+            const select1Value = document.getElementById("specificRangeSelect1").value;
+            const select2Value = document.getElementById("specificRangeSelect2").value;
+    
+            const data1 = labels.map(exam => examStats[exam][select1Value]);
+            const data2 = labels.map(exam => examStats[exam][select2Value]);
+    
+            const label1Text = document.getElementById("specificRangeSelect1").options[document.getElementById("specificRangeSelect1").selectedIndex].text;
+            const label2Text = document.getElementById("specificRangeSelect2").options[document.getElementById("specificRangeSelect2").selectedIndex].text;
+    
+            window.specificRangeChart.data.datasets[0].data = data1;
+            window.specificRangeChart.data.datasets[0].label = label1Text;
+            window.specificRangeChart.data.datasets[1].data = data2;
+            window.specificRangeChart.data.datasets[1].label = label2Text;
+            window.specificRangeChart.update();
+        }
+    
+        document.addEventListener("DOMContentLoaded", fetchData);
+    </script>
+</body>
+</html>
