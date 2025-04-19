@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Mains 2025 Marks Calculator </title>
+    <meta name="description" content="JEE Main 2025 Score Calculator: Calculate your JEE Mains 2025 score using your response sheet URL or HTML file provided by NTA.">
+    <meta name="keywords" content="JEE Main 2025, JEE Marks Calculator, JEE Main April Session, JEE Mains Score Calculator, JEE Mains Session 2, NTA response sheet, JEE 2025 scorecard, JEE score evaluation, JEE exam analysis, JEE result checker">
+    <meta name="author" content="Novadrone16">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://j2025scorecard.netlify.app/">
+    <meta property="og:title" content="JEE Mains 2025 Score Calculator">
+    <meta property="og:description" content="Easily calculate your JEE Mains 2025 score with this tool using your response sheet.">
+    <meta property="og:url" content="https://j2025scorecard.netlify.app/">
+    <meta property="og:type" content="website">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <meta name="msvalidate.01" content="0B663B74E91F444873E184891C454655" />
+    <script data-goatcounter="https://novadrone16.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js">
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NZ2TCWXZLL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+      
+        gtag('config', 'G-NZ2TCWXZLL');
+      </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .form-label, .btn, .table, h1, h2, h3, p {
+            color: #e0e0e0;
+        }
+        .table-dark {
+            background-color: #333333;
+        }
+        .table-success {
+            background-color: #1b5e20 !important;
+        }
+        .table-danger {
+            background-color: #b71c1c !important;
+        }
+        #toggleIncorrect {
+            color: #e0e0e0;
+            background-color: #333333;
+            border: 1px solid #555555;
+        }
+
+        #toggleIncorrect:hover {
+            background-color: #444444;
+            color: #ffffff;
+        }
+        #loadingSpinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #loadingSpinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        } 
+        .trash-icon {
+            cursor: pointer;
+        }
+        #filterDropdown {
+            min-width: 190px;
+            padding: 8px;
+            /*background: rgb(212, 212, 212);*/
+            background: #e9fbff;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.12s ease-in-out, transform 0.12s ease-in-out;
+            display: none;
+            z-index: 1051;
+        }
+        #filterDropdown label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            padding: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        #filterDropdown label:hover {
+            background: rgba(0, 116, 217, 0.1);
+        }
+        #filterDropdown button {
+            width: 48%;
+            font-size: 14px;
+            padding: 6px;
+        }
+        #filterDropdown hr {
+            margin: 8px 0;
+        }
+        .show {
+            display: block !important;
+        }
+        #filterDropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px) translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+        }
+        .show-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        #menuContent {
+            opacity: 0;
+            transform: translateY(-5px);
+            display: none;
+        }
+        #menuContent.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        .menu-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        @media (min-width: 1200px) {
+            #urlMaskOverlay {
+                display: flex !important;
+            }
+        }
+        @media (max-width: 1199px) {
+            #urlMaskOverlay {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal fade" id="initialModal" tabindex="-1" aria-labelledby="initialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title" id="initialModalLabel" style="font-weight: bold; font-size: 1.5rem;">Points to Be Noted</h5>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; color: #34d399;">
+                        Updated with international final ans keys of april session!!
+                    </p>
+                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #34d399;">
+                        Estimated Marks vs Percentile is now live on the stats page - <a href="/stats.html" class="text-primary" style="text-decoration: underline;">Click Here</a>
+                    </p>
+                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ced334;">
+                        If you have response sheet PDF, <a href="/url-extractor.html" class="text-primary" style="text-decoration: underline;">Click Here</a> to extract your response sheet URL.
+                    </p>
+                    <!--<p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ced334;">
+                        Predict your percentile (based on approx 1.7k unique scores per shift) - <a href="/percentile-predictor.html" class="text-primary" style="text-decoration: underline;">Click Here</a>
+                    </p>-->
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">1.</span> Select the session and exam shift, enter the <b>response sheet URL from NTA site</b> (starting with <code>cdn3.digialm.com</code>), and click "Evaluate" to calculate your score.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">2.</span> Use the <b>filter</b> button to view Correct/Incorrect questions by subject. <b>Click any row</b> to view analysis with images.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">3.</span> Your score data is stored in your browser's <b>local storage</b> when you first use it. Next time, simply enter the response sheet URL, no need to enter the exam date.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span style="font-weight: bold;">4.</span> Facing issues? <b>DM me on Reddit </b>(<code>u/Novadrone16</code>).
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-5" data-bs-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="floatingReminder" class="alert alert-info alert-dismissible fade hide" role="alert" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1050;">
+        <span id="floatingReminderText">Click on any question row to view it completely.</span>
+        <button type="button" class="btn-close" aria-label="Close"></button>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4"><b>JEE 2025 Scorecard (INTERNATIONAL)</b></h1>
+        <div id="hamburgerMenu" class="position-fixed" style="top: 20px; right: 20px; z-index: 1050; cursor: pointer;">
+            <i class="fas fa-bars" style="color: #e0e0e0; font-size: 24px;"></i>
+        </div>
+        <div id="menuContent" class="position-fixed bg-dark p-3 rounded"
+            style="top: 60px; right: 20px; display: none; width: 230px; height: auto; border-radius: 10px; transition: opacity 0.2s ease, transform 0.2s ease; box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); z-index: 1052;">
+            <a href="#" id="menuInfo" class="d-flex align-items-center text-white text-decoration-none menu-item">
+                <i class="fas fa-info-circle me-2"></i> Info
+            </a>
+            <a href="/stats.html" id="menuStats" class="d-flex align-items-center text-white text-decoration-none mt-2 menu-item">
+                <i class="fas fa-chart-bar me-2"></i> Stats
+            </a>
+            <hr class="text-white my-2">
+            <a href="https://github.com/th3-w41k3r5/Jee2025ScoreCalculator" target="_blank" class="d-flex align-items-center text-primary text-decoration-none menu-item" style="text-decoration: none;">
+                (Source Code)
+            </a>
+        </div>
+        <form id="evaluationForm" class="mb-4">
+            <div class="mb-3">
+                <label for="sessionSelect" class="form-label">Select Session:</label>
+                <select id="sessionSelect" class="form-select bg-dark text-light">
+                    <option value="April">April</option>
+                    <!--<option value="January">January</option>-->
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="examDate" class="form-label">Select Exam Date and Shift:</label>
+                <select id="examDate" class="form-select bg-dark text-light"></select>
+            </div>
+
+            <div class="mb-3">
+                <label for="answerSheetUrl" class="form-label">Enter Response Sheet URL (must start with <code>https://cdn3.digialm.com</code>):</label>
+                <div style="position: relative;">
+                    <input type="url" id="answerSheetUrl" class="form-control bg-dark text-light" placeholder="Paste the URL here">
+                    <div id="urlMaskOverlay" style="position: absolute; right: 0.1px; top: 0.9px; bottom: 1px; width: 37%;
+                                backdrop-filter: blur(5px);
+                                pointer-events: none;
+                                border-top-right-radius: 0.32rem;
+                                border-bottom-right-radius: 0.32rem;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                                padding-right: 5px;">
+                        <i id="toggleUrlMask" class="fas fa-eye-slash" style="cursor: pointer; color: #777; pointer-events: auto;"></i>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="mb-3 position-relative">
+                <label for="answerSheetFile" class="form-label"><b>OR</b> Upload Response Sheet html File:</label>
+                <div class="input-group">
+                    <input type="file" id="answerSheetFile" class="form-control bg-dark text-light" accept=".html">
+                    <span class="input-group-text bg-dark text-light trash-icon" id="removeFile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>-->
+            <button type="submit" class="btn btn-primary w-100">Evaluate</button>
+        </form>
+
+        <div class="modal fade" id="dateMismatchModal" tabindex="-1" aria-labelledby="dateMismatchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dateMismatchModalLabel">Date Mismatch</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Please choose the correct date for the corresponding response sheet.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="d-none">
+            <div id="loadingSpinner" class="text-center d-none my-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Fetching data, please wait...</p>
+            </div>
+        
+            <div id="resultsSummary" class="mb-4"></div>
+        
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">Detailed Question Evaluation</h3>
+                <div class="dropdown">
+                    <button id="filterButton" class="btn btn-dark">
+                        <i class="fa fa-filter"></i> Filter
+                    </button>
+                    <div id="filterDropdown" class="dropdown-menu p-2">
+                        <strong>Status:</strong><br>
+                        <label><input type="checkbox" id="filterCorrect" checked> <i class="fas fa-check-circle fa-lg" style="color: #00a303;"></i> Correct</label>
+                        <label><input type="checkbox" id="filterIncorrect" checked> <i class="fas fa-times-circle fa-lg" style="color: #fb0404;"></i> Incorrect</label>
+                        <label><input type="checkbox" id="filterUnattempted" checked> <i class="far fa-circle fa-lg" style="color: #adb5bd;"></i> Unattempted</label>
+                        <label><input type="checkbox" id="filterDropped" checked> <i class="fas fa-minus-circle fa-lg" style="color: #adb5bd;"></i> Dropped</label>
+                        <hr>
+                        <strong>Subjects:</strong>
+                        <div id="subjectFilters"></div>
+                
+                        <button id="applyFilter" class="btn btn-primary btn-sm mt-2">OK</button>
+                        <button id="resetFilter" class="btn btn-secondary btn-sm mt-2">Reset</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="table-responsive"> <table class="table table-bordered table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Question ID</th>
+                        <th>Your Answer</th>
+                        <th>Correct Answer</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable" style="cursor: pointer; font-size: 0.9rem;"></tbody>
+              </table>
+            </div>
+        </div>
+        
+        <div id="questionModal" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-center">
+                        <h5 id="modalQuestionTitle" class="modal-title text-dark"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="questionImage" src="" alt="Question Image" class="img-fluid mb-3 d-none">
+                        <div class="alert alert-secondary p-2"><strong>Your Answer:</strong> <span id="modalYourAnswer"></span></div>
+                        <div class="alert alert-secondary p-2"><strong>Correct Answer:</strong> <span id="modalCorrectAnswer"></span></div>
+                        <div class="alert p-2" id="modalEvaluation"></div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+    <script src="anskey.js"></script>
+    <script src="script3.js"></script>
+    <script>
+        const urlMaskOverlay = document.getElementById('urlMaskOverlay');
+        const toggleUrlMaskIcon = document.getElementById('toggleUrlMask');
+        let isMasked = true;  
+        toggleUrlMaskIcon.addEventListener('click', () => {
+            isMasked = !isMasked;
+            if (isMasked) {
+                urlMaskOverlay.style.backdropFilter = 'blur(5px)';
+                toggleUrlMaskIcon.classList.remove('fa-eye');
+                toggleUrlMaskIcon.classList.add('fa-eye-slash');
+            } else {
+                urlMaskOverlay.style.backdropFilter = 'blur(0)';
+                toggleUrlMaskIcon.classList.remove('fa-eye-slash');
+                toggleUrlMaskIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+    <!--<script disable-devtool-auto src='https://cdn.jsdelivr.net/npm/disable-devtool'></script>-->
+</body>
+</html>
