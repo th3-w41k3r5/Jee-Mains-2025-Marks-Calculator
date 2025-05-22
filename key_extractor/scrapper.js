@@ -14,3 +14,22 @@
     });
     console.log(JSON.stringify(result, null, 4));
 })();
+
+//advanced version
+(function() {
+    const questionIdElements = document.querySelectorAll('td.bold');
+    const questionIds = {};
+  
+    questionIdElements.forEach(element => {
+      const prevSibling = element.previousElementSibling;
+      if (prevSibling && prevSibling.textContent.trim() === 'Question ID :') {
+        const questionId = element.textContent.trim();
+        if (questionId) {
+          questionIds[questionId] = "";
+        }
+      }
+    });
+  
+    const output = JSON.stringify(questionIds, null, 4);
+    console.log(output);
+})();
