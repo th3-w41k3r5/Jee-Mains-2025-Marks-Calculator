@@ -1,877 +1,2125 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stats - J2025Scorecard | Marks vs Percentile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script data-goatcounter="https://novadrone16.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js">
-    </script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stats - J2025Scorecard | JEE Advanced 2025</title>
+    <meta name="description" content="JEE Advanced 2025 Score Distribution, leaderboard and other stats">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="msvalidate.01" content="0B663B74E91F444873E184891C454655" />
+    <script
+      data-goatcounter="https://novadrone16.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"
+    ></script>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NZ2TCWXZLL"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-NZ2TCWXZLL"
+    ></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-      
-        gtag('config', 'G-NZ2TCWXZLL');
-      </script>
-    <style>
-        body {
-            background-color: #1a202c;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-        }
-        .container-custom {
-            background: #1F2937;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #374151;
-            text-align: left;
-        }
-        th {
-            background: #374151;
-        }
-        tr:hover {
-            background: #2D3748;
-        }
-        .toggle-btn {
-            cursor: pointer;
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .disclaimer {
-            font-size: 0.85rem;
-            font-style: italic;
-            color: #9ca3af;
-            margin-top: 10px;
-        }
-        .highlight {
-            color: #fbbf24;
-            font-weight: 600;
-        }
-        .reddit-link {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-        .reddit-link:hover {
-            text-decoration: underline;
-            color: #60a5fa;
-        }
-        .analysis-container {
-            background: #2D3748;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        .analysis-title {
-            color: #0bb3f5;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        .shift-item {
-            margin-bottom: 15px;
-        }
-        .shift-title {
-            font-weight: 600;
-            color: #d1d5db;
-        }
-        .impact-factor {
-            color: #9ca3af;
-            font-size: 0.9rem;
-            margin-left: 20px;
-        }
-    </style>
-</head>
-<body class="p-4">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-    <h1 class="text-center mb-4"><strong>Stats - J2025Scorecard</strong></h1>
-
-    <p class="text-center mb-4">Last Updated: <span id="lastUpdated">Loading...</span></p>
-
-    <div class="container-custom text-center p-3">
-        <p class="fs-5 fw-bold mb-0">Total Scores Recorded: <span id="totalScores" class="text-info">Loading...</span></p>
-    </div>
-
-    <div class="container-custom">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fs-4">Estimated Marks vs Percentile</h2>
-            <!--<div>
-                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('percentileTableContainer', 'percentileChartContainer')"></i>
-                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('percentileChartContainer', 'percentileTableContainer')"></i>
-            </div>-->
-        </div>
-
-        <div id="percentileTableContainer">
-            <div class="table-responsive">
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th style="position: sticky; left: -1px; z-index: 1;">Percentile</th>
-                            <th>April 2s1</th>
-                            <th>April 2s2</th>
-                            <th>April 3s1</th>
-                            <th>April 3s2</th>
-                            <th>April 4s1</th>
-                            <th>April 4s2</th>
-                            <th>April 7s1</th>
-                            <th>April 7s2</th>
-                            <th>April 8s2</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99</td>
-                            <td style="color: cyan;">176</td>
-                            <td style="color: rgb(250, 226, 70);">205</td>
-                            <td style="color: rgb(0, 255, 0);">165</td>
-                            <td style="color: cyan;">194</td>
-                            <td style="color: cyan;">178</td>
-                            <td style="color: cyan;">180</td>
-                            <td style="color: cyan;">175</td>
-                            <td style="color: cyan;">184</td>
-                            <td style="color: cyan;">182</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">98.5</td>
-                            <td>165</td>
-                            <td>192</td>
-                            <td>155</td>
-                            <td>182</td>
-                            <td>167</td>
-                            <td>169</td>
-                            <td>164</td>
-                            <td>172</td>
-                            <td>170</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">98</td>
-                            <td>155</td>
-                            <td>182</td>
-                            <td>146</td>
-                            <td>172</td>
-                            <td>157</td>
-                            <td>159</td>
-                            <td>154</td>
-                            <td>162</td>
-                            <td>160</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">97.5</td>
-                            <td>147</td>
-                            <td>173</td>
-                            <td>138</td>
-                            <td>163</td>
-                            <td>149</td>
-                            <td>151</td>
-                            <td>146</td>
-                            <td>154</td>
-                            <td>152</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">97</td>
-                            <td>140</td>
-                            <td>165</td>
-                            <td>132</td>
-                            <td>155</td>
-                            <td>142</td>
-                            <td>144</td>
-                            <td>139</td>
-                            <td>147</td>
-                            <td>145</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">96.5</td>
-                            <td>134</td>
-                            <td>158</td>
-                            <td>127</td>
-                            <td>149</td>
-                            <td>136</td>
-                            <td>138</td>
-                            <td>133</td>
-                            <td>141</td>
-                            <td>139</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">96</td>
-                            <td>129</td>
-                            <td>152</td>
-                            <td>122</td>
-                            <td>143</td>
-                            <td>131</td>
-                            <td>133</td>
-                            <td>128</td>
-                            <td>136</td>
-                            <td>134</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">95.5</td>
-                            <td>124</td>
-                            <td>147</td>
-                            <td>118</td>
-                            <td>138</td>
-                            <td>126</td>
-                            <td>128</td>
-                            <td>123</td>
-                            <td>131</td>
-                            <td>130</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">95</td>
-                            <td>120</td>
-                            <td>142</td>
-                            <td>114</td>
-                            <td>134</td>
-                            <td>122</td>
-                            <td>124</td>
-                            <td>119</td>
-                            <td>127</td>
-                            <td>125</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">94</td>
-                            <td>113</td>
-                            <td>134</td>
-                            <td>107</td>
-                            <td>126</td>
-                            <td>115</td>
-                            <td>117</td>
-                            <td>112</td>
-                            <td>120</td>
-                            <td>118</td>
-                        </tr>
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">93</td>
-                            <td>107</td>
-                            <td>127</td>
-                            <td>101</td>
-                            <td>119</td>
-                            <td>109</td>
-                            <td>110</td>
-                            <td>106</td>
-                            <td>114</td>
-                            <td>112</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <p class="disclaimer">Disclaimer: These are predictions based on available dataset to J2025Scorecard Marks Calculator. Actual NTA percentiles will differ.</p>
-        </div>
-        <div class="table-responsive mt-4">
-            <table class="table table-dark table-striped">
-                <thead>
-                    <tr>
-                        <th style="position: sticky; left: -1px; z-index: 1;">Percentile</th>
-                        <th>April 2s1</th>
-                        <th>April 2s2</th>
-                        <th>April 3s1</th>
-                        <th>April 3s2</th>
-                        <th>April 4s1</th>
-                        <th>April 4s2</th>
-                        <th>April 7s1</th>
-                        <th>April 7s2</th>
-                        <th>April 8s2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.9</td>
-                        <td>236</td>
-                        <td>271</td>
-                        <td>220</td>
-                        <td>258</td>
-                        <td>239</td>
-                        <td>241</td>
-                        <td>234</td>
-                        <td>247</td>
-                        <td>244</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.8</td>
-                        <td>220</td>
-                        <td>255</td>
-                        <td>206</td>
-                        <td>242</td>
-                        <td>223</td>
-                        <td>225</td>
-                        <td>218</td>
-                        <td>231</td>
-                        <td>228</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.7</td>
-                        <td>210</td>
-                        <td>244</td>
-                        <td>196</td>
-                        <td>231</td>
-                        <td>213</td>
-                        <td>215</td>
-                        <td>208</td>
-                        <td>221</td>
-                        <td>218</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.6</td>
-                        <td>202</td>
-                        <td>235</td>
-                        <td>189</td>
-                        <td>222</td>
-                        <td>205</td>
-                        <td>207</td>
-                        <td>200</td>
-                        <td>212</td>
-                        <td>210</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.5</td>
-                        <td>196</td>
-                        <td>228</td>
-                        <td>183</td>
-                        <td>215</td>
-                        <td>199</td>
-                        <td>201</td>
-                        <td>194</td>
-                        <td>206</td>
-                        <td>203</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.4</td>
-                        <td>190</td>
-                        <td>222</td>
-                        <td>178</td>
-                        <td>209</td>
-                        <td>193</td>
-                        <td>195</td>
-                        <td>188</td>
-                        <td>200</td>
-                        <td>197</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.3</td>
-                        <td>186</td>
-                        <td>217</td>
-                        <td>174</td>
-                        <td>204</td>
-                        <td>189</td>
-                        <td>191</td>
-                        <td>184</td>
-                        <td>195</td>
-                        <td>193</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.2</td>
-                        <td>182</td>
-                        <td>213</td>
-                        <td>170</td>
-                        <td>200</td>
-                        <td>185</td>
-                        <td>187</td>
-                        <td>180</td>
-                        <td>191</td>
-                        <td>189</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.1</td>
-                        <td>179</td>
-                        <td>209</td>
-                        <td>167</td>
-                        <td>197</td>
-                        <td>182</td>
-                        <td>184</td>
-                        <td>177</td>
-                        <td>187</td>
-                        <td>185</td>
-                    </tr>
-                    <tr>
-                        <td style="position: sticky; left: -1px; z-index: 1; color: cyan;">99.0</td>
-                        <td>176</td>
-                        <td>205</td>
-                        <td>165</td>
-                        <td>194</td>
-                        <td>178</td>
-                        <td>180</td>
-                        <td>175</td>
-                        <td>184</td>
-                        <td>182</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div id="percentileChartContainer" class="d-none">
-            <canvas id="percentileChart"></canvas>
-            <p class="disclaimer">Disclaimer: These are predictions based on available dataset to J2025Scorecard Marks Calculator. Actual NTA percentiles may differ.</p>
-        </div>
-
-        <!-- Analysis Section -->
-        <div class="analysis-container">
-            <h3 class="analysis-title">April 2025 Session Shifts (Hardest to Easiest)</h3>
-            
-            <div class="shift-item">
-                <p class="shift-title">1. April 3, Shift 1 (Hardest)</p>
-                <p class="impact-factor">• Lowest 99th percentile score: 165</p>
-                <p class="impact-factor">• Impact factors: Only 39 scorers above 200 out of 2255 records (1.7%)</p>
-                <p class="impact-factor">• Key insight: Despite median of 76, the lack of high scorers significantly impacts percentile boundaries</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">2. April 7, Shift 1</p>
-                <p class="impact-factor">• 99th percentile score: 175</p>
-                <p class="impact-factor">• Impact factors: Only 69 scorers above 200 out of 2226 records (3.1%)</p>
-                <p class="impact-factor">• Profile: Second lowest number of 250+ scorers (only 5)</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">3. April 2, Shift 1</p>
-                <p class="impact-factor">• 99th percentile score: 176</p>
-                <p class="impact-factor">• Impact factors: Despite lowest median (66), has relatively better high-end performance</p>
-                <p class="impact-factor">• Key insight: 73 scorers above 200 out of 2281 records (3.2%), including 14 above 250</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">4. April 4, Shift 1</p>
-                <p class="impact-factor">• 99th percentile score: 178</p>
-                <p class="impact-factor">• Impact factors: 79 scorers above 200 out of 2228 records (3.5%)</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">5. April 4, Shift 2</p>
-                <p class="impact-factor">• 99th percentile score: 180</p>
-                <p class="impact-factor">• Impact factors: 102 scorers above 200 out of 2354 records (4.3%)</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">6. April 8, Shift 2</p>
-                <p class="impact-factor">• 99th percentile score: 182</p>
-                <p class="impact-factor">• Impact factors: 92 scorers above 200 out of 2121 records (4.3%), better ratio than April 4 Shift 2</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">7. April 7, Shift 2</p>
-                <p class="impact-factor">• 99th percentile score: 184</p>
-                <p class="impact-factor">• Impact factors: 111 scorers above 200 out of 2319 records (4.8%)</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">8. April 3, Shift 2</p>
-                <p class="impact-factor">• 99th percentile score: 194</p>
-                <p class="impact-factor">• Impact factors: 172 scorers above 200 out of 2340 records (7.4%)</p>
-                <p class="impact-factor">• High median (89) combined with significant number of top scorers</p>
-            </div>
-            
-            <div class="shift-item">
-                <p class="shift-title">9. April 2, Shift 2 (Easiest)</p>
-                <p class="impact-factor">• 99th percentile score: 205</p>
-                <p class="impact-factor">• Impact factors: 186 scorers above 200 out of 2344 records (7.9%)</p>
-                <p class="impact-factor">• Highest median (96.5) and highest number of top scorers (37 above 250)</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="container-custom">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fs-4">Median & Avg Scores</h2>
-            <div>
-                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('medianAvgTableContainer', 'medianAvgChartContainer')"></i>
-                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('medianAvgChartContainer', 'medianAvgTableContainer')"></i>
-            </div>
-        </div>
-
-        <div id="medianAvgTableContainer">
-            <div class="table-responsive">
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th>Exam Date</th>
-                            <th>Scores Recorded</th>
-                            <th>Median</th>
-                            <th>Avg</th>
-                        </tr>
-                    </thead>
-                    <tbody id="medianAvgTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="medianAvgChartContainer" class="d-none">
-            <canvas id="medianAvgChart"></canvas>
-        </div>
-        <div class="mt-2">
-            <small class="text-white">
-                <strong>Note:</strong> The median score is calculated based on the unique scores recorded.
-            </small>
-        </div>
-    </div>
-
-    <div class="container-custom">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fs-4">Above Score Ranges</h2>
-            <div id="aboveScoreChartControls" class="d-none">
-                <select id="aboveScoreSelect1">
-                    <option value="above140">Above 140</option>
-                    <option value="above180">Above 180</option>
-                    <option value="above200">Above 200</option>
-                    <option value="above230">Above 230</option>
-                    <option value="above250">Above 250</option>
-                </select>
-                <select id="aboveScoreSelect2">
-                    <option value="above180">Above 180</option>
-                    <option value="above140">Above 140</option>
-                    <option value="above200">Above 200</option>
-                    <option value="above230">Above 230</option>
-                    <option value="above250">Above 250</option>
-                </select>
-            </div>
-            <div>
-                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('aboveScoreTableContainer', 'aboveScoreChartContainer')"></i>
-                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('aboveScoreChartContainer', 'aboveScoreTableContainer')"></i>
-            </div>
-        </div>
-
-        <div id="aboveScoreTableContainer">
-            <div class="table-responsive">
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th style="position: sticky; left: -1px; z-index: 1;">Exam Date</th>
-                            <th>Scores Recorded</th>
-                            <th>Above 140</th>
-                            <th>Above 180</th>
-                            <th>Above 200</th>
-                            <th>Above 230</th>
-                            <th>Above 250</th>
-                        </tr>
-                    </thead>
-                    <tbody id="aboveScoreTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="aboveScoreChartContainer" class="d-none">
-            <canvas id="aboveScoreChart"></canvas>
-        </div>
-    </div>
-
-    <div class="container-custom">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fs-4">Specific Score Ranges</h2>
-            <div id="specificRangeChartControls" class="d-none">
-                <select id="specificRangeSelect1">
-                    <option value="range_140_160">140-160</option>
-                    <option value="range_180_200">180-200</option>
-                    <option value="range_200_230">200-230</option>
-                    <option value="range_250_above">250+</option>
-                </select>
-                <select id="specificRangeSelect2">
-                    <option value="range_180_200">180-200</option>
-                    <option value="range_140_160">140-160</option>
-                    <option value="range_200_230">200-230</option>
-                    <option value="range_250_above">250+</option>
-                </select>
-            </div>
-            <div>
-                <i class="fas fa-table toggle-btn btn btn-sm btn-secondary" onclick="toggleView('specificRangeTableContainer', 'specificRangeChartContainer')"></i>
-                <i class="fas fa-chart-bar toggle-btn btn btn-sm btn-secondary" onclick="toggleView('specificRangeChartContainer', 'specificRangeTableContainer')"></i>
-            </div>
-        </div>
-
-        <div id="specificRangeTableContainer">
-            <div class="table-responsive">
-                <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th style="position: sticky; left: -1px; z-index: 1;">Exam Date</th>
-                            <th>Scores Recorded</th>
-                            <th>140-160</th>
-                            <th>180-200</th>
-                            <th>200-230</th>
-                            <th>250+</th>
-                        </tr>
-                    </thead>
-                    <tbody id="specificRangeTable"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="specificRangeChartContainer" class="d-none">
-            <canvas id="specificRangeChart"></canvas>
-        </div>
-    </div>
-
-    <footer>
-        TOTAL ACTIVE USERS - <span id="totalUsers" class="text-info">Loading...</span> <span style="font-size: small;">(Last 90 days)</span> <br>
-        By - <span class="text-primary">u/Novadrone16</span>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        async function fetchData() {
-            const Url = "";
-            const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(Url)}`;
-    
-            try {
-                const response = await fetch(proxyUrl);
-                //const response = await fetch("/.netlify/functions/fetchStats");
-
-                const stats = await response.json();
-    
-                const apiTime = stats.lastUpdated;
-    
-                const year = apiTime.substring(0, 4);
-                const month = apiTime.substring(5, 7);
-                const day = apiTime.substring(8, 10);
-                const hour = apiTime.substring(11, 13);
-                const minute = apiTime.substring(14, 16);
-                const hour12 = (parseInt(hour) % 12) || 12;
-                const ampm = parseInt(hour) >= 12 ? 'PM' : 'AM';
-    
-                const formattedDate = `${day}/${month}/${year} - ${hour12.toString().padStart(2, '0')}:${minute.padStart(2, '0')} ${ampm}`;
-    
-                document.getElementById("lastUpdated").textContent = formattedDate;
-                document.getElementById("totalScores").textContent = stats.totalCountAllDates;
-                //document.getElementById("activeUsers").textContent = stats.analytics.realTime.activeUsersLast30Min || "0";
-                document.getElementById("totalUsers").textContent = stats.analytics.last90Days.totalUsers;
-    
-                const examStats = stats.examStats;
-    
-                const examDates = Object.keys(examStats).map(exam => {
-                    const parts = exam.split('-');
-                    const dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
-                    const date = new Date(dateStr);
-                    const shift = parts.length > 4 ? parseInt(parts[4]) : 1;
-                    return { exam, date, shift };
-                });
-
-                examDates.sort((a, b) => {
-                    const dateComparison = a.date - b.date;
-                    return dateComparison !== 0 ? dateComparison : a.shift - b.shift;
-                });
-
-                let medianAvgHtml = "", aboveScoreHtml = "", specificRangeHtml = "";
-    
-                const examLabels = examDates.map(item => item.exam);
-                const medianData = examDates.map(({ exam }) => examStats[exam].median);
-                const averageData = examDates.map(({ exam }) => examStats[exam].average);
-    
-                const above140Data = examDates.map(({ exam }) => examStats[exam].above140);
-                const above180Data = examDates.map(({ exam }) => examStats[exam].above180);
-                const above200Data = examDates.map(({ exam }) => examStats[exam].above200);
-                const above230Data = examDates.map(({ exam }) => examStats[exam].above230);
-                const above250Data = examDates.map(({ exam }) => examStats[exam].above250);
-    
-                const range140_160Data = examDates.map(({ exam }) => examStats[exam].range_140_160);
-                const range180_200Data = examDates.map(({ exam }) => examStats[exam].range_180_200);
-                const range200_230Data = examDates.map(({ exam }) => examStats[exam].range_200_230);
-                const range250_aboveData = examDates.map(({ exam }) => examStats[exam].range_250_above);
-    
-                examDates.forEach(({ exam }) => {
-                    const data = examStats[exam];
-    
-                    medianAvgHtml += `
-                        <tr>
-                            <td>${exam}</td>
-                            <td>${data.totalCount}</td>
-                            <td>${data.median}</td>
-                            <td>${data.average.toFixed(2)}</td>
-                        </tr>`;
-    
-                    aboveScoreHtml += `
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1;">${exam}</td>
-                            <td>${data.totalCount}</td>
-                            <td>${data.above140}</td>
-                            <td>${data.above180}</td>
-                            <td>${data.above200}</td>
-                            <td>${data.above230}</td>
-                            <td>${data.above250}</td>
-                        </tr>`;
-    
-                    specificRangeHtml += `
-                        <tr>
-                            <td style="position: sticky; left: -1px; z-index: 1;">${exam}</td>
-                            <td>${data.totalCount}</td>
-                            <td>${data.range_140_160}</td>
-                            <td>${data.range_180_200}</td>
-                            <td>${data.range_200_230}</td>
-                            <td>${data.range_250_above}</td>
-                        </tr>`;
-                });
-    
-                document.getElementById("medianAvgTable").innerHTML = medianAvgHtml;
-                document.getElementById("aboveScoreTable").innerHTML = aboveScoreHtml;
-                document.getElementById("specificRangeTable").innerHTML = specificRangeHtml;
-    
-                createChart("medianAvgChart", examLabels, medianData, averageData, "Median Scores", "Average Scores");
-                window.aboveScoreChart = createAboveScoreChart("aboveScoreChart", examLabels, above140Data, above180Data, "Above 140", "Above 180");
-                window.specificRangeChart = createSpecificRangeChart("specificRangeChart", examLabels, range140_160Data, range180_200Data, "140-160", "180-200");
-    
-                document.getElementById("aboveScoreSelect1").addEventListener("change", () => updateAboveScoreChart(examLabels, examStats));
-                document.getElementById("aboveScoreSelect2").addEventListener("change", () => updateAboveScoreChart(examLabels, examStats));
-                document.getElementById("specificRangeSelect1").addEventListener("change", () => updateSpecificRangeChart(examLabels, examStats));
-                document.getElementById("specificRangeSelect2").addEventListener("change", () => updateSpecificRangeChart(examLabels, examStats));
-    
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        }
-    
-        function toggleView(showId, hideId) {
-            document.getElementById(showId).classList.remove("d-none");
-            document.getElementById(hideId).classList.add("d-none");
-    
-            if (showId === "aboveScoreChartContainer") {
-                document.getElementById("aboveScoreChartControls").classList.remove("d-none");
-            } else {
-                document.getElementById("aboveScoreChartControls").classList.add("d-none");
-            }
-    
-            if (showId === "specificRangeChartContainer") {
-                document.getElementById("specificRangeChartControls").classList.remove("d-none");
-            } else {
-                document.getElementById("specificRangeChartControls").classList.add("d-none");
-            }
-        }
-    
-        function createChart(canvasId, labels, data1, data2, label1, label2) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            return new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label1,
-                        data: data1,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: label2,
-                        data: data2,
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-    
-        function createAboveScoreChart(canvasId, labels, data1, data2, label1, label2) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-             const newChart =  new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label1,
-                        data: data1,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: label2,
-                        data: data2,
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                     responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-            return newChart;
-        }
-    
-        function createSpecificRangeChart(canvasId, labels, data1, data2, label1, label2) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            const newChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label1,
-                        data: data1,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: label2,
-                        data: data2,
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                     responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-            return newChart;
-        }
-    
-        function updateAboveScoreChart(labels, examStats) {
-            const select1Value = document.getElementById("aboveScoreSelect1").value;
-            const select2Value = document.getElementById("aboveScoreSelect2").value;
-    
-            const data1 = labels.map(exam => examStats[exam][select1Value]);
-            const data2 = labels.map(exam => examStats[exam][select2Value]);
-    
-            const label1Text = document.getElementById("aboveScoreSelect1").options[document.getElementById("aboveScoreSelect1").selectedIndex].text;
-            const label2Text = document.getElementById("aboveScoreSelect2").options[document.getElementById("aboveScoreSelect2").selectedIndex].text;
-    
-            window.aboveScoreChart.data.datasets[0].data = data1;
-            window.aboveScoreChart.data.datasets[0].label = label1Text;
-            window.aboveScoreChart.data.datasets[1].data = data2;
-            window.aboveScoreChart.data.datasets[1].label = label2Text;
-            window.aboveScoreChart.update();
-        }
-    
-        function updateSpecificRangeChart(labels, examStats) {
-            const select1Value = document.getElementById("specificRangeSelect1").value;
-            const select2Value = document.getElementById("specificRangeSelect2").value;
-    
-            const data1 = labels.map(exam => examStats[exam][select1Value]);
-            const data2 = labels.map(exam => examStats[exam][select2Value]);
-    
-            const label1Text = document.getElementById("specificRangeSelect1").options[document.getElementById("specificRangeSelect1").selectedIndex].text;
-            const label2Text = document.getElementById("specificRangeSelect2").options[document.getElementById("specificRangeSelect2").selectedIndex].text;
-    
-            window.specificRangeChart.data.datasets[0].data = data1;
-            window.specificRangeChart.data.datasets[0].label = label1Text;
-            window.specificRangeChart.data.datasets[1].data = data2;
-            window.specificRangeChart.data.datasets[1].label = label2Text;
-            window.specificRangeChart.update();
-        }
-    
-        document.addEventListener("DOMContentLoaded", fetchData);
+      gtag("config", "G-NZ2TCWXZLL");
     </script>
-</body>
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+
+      .card {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .card:hover {
+        background: rgba(30, 41, 59, 0.9);
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+      }
+
+      .stats-number {
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .subject-badge {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .subject-badge::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .subject-badge:hover::before {
+        left: 100%;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 12px;
+        padding: 16px;
+      }
+
+      .toggle-btn {
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+        transition: all 0.3s ease;
+      }
+
+      .toggle-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+      }
+
+      .leaderboard-item {
+        background: linear-gradient(
+          90deg,
+          rgba(59, 130, 246, 0.1),
+          rgba(139, 92, 246, 0.1)
+        );
+        border-left: 4px solid;
+        animation: slideIn 0.5s ease forwards;
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      .leaderboard-item:nth-child(1) {
+        border-left-color: #ffd700;
+        animation-delay: 0.1s;
+      }
+
+      .leaderboard-item:nth-child(2) {
+        border-left-color: #c0c0c0;
+        animation-delay: 0.2s;
+      }
+
+      .leaderboard-item:nth-child(3) {
+        border-left-color: #cd7f32;
+        animation-delay: 0.3s;
+      }
+
+      .leaderboard-item:nth-child(n + 4) {
+        border-left-color: #3b82f6;
+      }
+
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .pulse-dot {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .comparison-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: rgb(55 65 81 / var(--tw-bg-opacity, 1));
+        position: relative;
+        overflow: hidden;
+      }
+
+      .comparison-bar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+
+        100% {
+          left: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-4">
+          <i class="fas fa-chart-line mr-3 text-blue-400"></i>
+          Stats - J2025Scorecard (JEE Adv)
+        </h1>
+        <div class="flex items-center justify-center text-gray-300 mb-2">
+          <i class="fas fa-clock mr-2"></i>
+          <span id="lastUpdated">Loading...</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Total Scores Recorded</p>
+              <p class="stats-number text-3xl font-bold" id="totalCount">0</p>
+            </div>
+            <i class="fas fa-users text-blue-400 text-2xl"></i>
+          </div>
+        </div>
+        <div class="card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Active Users (30 min)</p>
+              <p class="stats-number text-3xl font-bold" id="activeUsers">0</p>
+            </div>
+            <i class="fas fa-user-clock text-green-400 text-2xl"></i>
+          </div>
+        </div>
+        <div class="card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">Highest Score</p>
+              <p class="stats-number text-3xl font-bold" id="highestScore">0</p>
+            </div>
+            <i class="fas fa-trophy text-yellow-400 text-2xl"></i>
+          </div>
+        </div>
+        <div class="card rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-300 text-sm">250+ Scorers</p>
+              <p class="stats-number text-3xl font-bold" id="top250Count">0</p>
+            </div>
+            <i class="fas fa-medal text-purple-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-chart-bar mr-3 text-blue-400"></i>
+            Score Distribution
+          </h2>
+          <button
+            id="toggleView"
+            class="toggle-btn px-4 py-2 rounded-lg text-white font-semibold flex items-center"
+          >
+            <i class="fas fa-table"></i>
+          </button>
+        </div>
+
+        <div id="tableView">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-600">
+                  <th class="text-left py-3 px-4">Score Range</th>
+                  <th class="text-right py-3 px-4">Students</th>
+                  <th class="text-right py-3 px-4">Percentage</th>
+                  <th class="text-left py-3 px-4">Distribution</th>
+                </tr>
+              </thead>
+              <tbody id="distributionTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="chartView" class="hidden">
+          <div class="chart-container">
+            <canvas id="distributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="card rounded-xl p-6">
+          <h2 class="text-2xl font-bold mb-6 flex items-center">
+            <i class="fas fa-balance-scale mr-3 text-yellow-400"></i>
+            Paper Difficulty Analysis
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300">Paper 1 Performance</span>
+                <span class="text-green-400 font-semibold" id="paper1Percentage"
+                  >0%</span
+                >
+              </div>
+              <div class="comparison-bar">
+                <div
+                  class="h-full bg-green-400 rounded"
+                  id="paper1Bar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">
+                Students who scored higher in Paper 1
+              </p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300">Paper 2 Performance</span>
+                <span class="text-blue-400 font-semibold" id="paper2Percentage"
+                  >0%</span
+                >
+              </div>
+              <div class="comparison-bar">
+                <div
+                  class="h-full bg-blue-400 rounded"
+                  id="paper2Bar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">
+                Students who scored higher in Paper 2
+              </p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300">Equal Performance</span>
+                <span class="text-yellow-400 font-semibold" id="equalPercentage"
+                  >0%</span
+                >
+              </div>
+              <div class="comparison-bar">
+                <div
+                  class="h-full bg-yellow-400 rounded"
+                  id="equalBar"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">
+                Students who scored equal in both the papers
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card rounded-xl p-6">
+          <h2 class="text-2xl font-bold mb-6 flex items-center">
+            <i class="fas fa-microscope mr-3 text-cyan-400"></i>
+            Subject-wise Paper Comparison
+          </h2>
+          <div class="space-y-4">
+            <div class="bg-red-500/10 p-4 rounded-lg border border-red-500/20">
+              <h4 class="font-semibold text-red-300 mb-2">Physics</h4>
+              <div class="text-sm text-gray-300" id="physicsComparison"></div>
+            </div>
+            <div
+              class="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20"
+            >
+              <h4 class="font-semibold text-blue-300 mb-2">Chemistry</h4>
+              <div class="text-sm text-gray-300" id="chemistryComparison"></div>
+            </div>
+            <div
+              class="bg-green-500/10 p-4 rounded-lg border border-green-500/20"
+            >
+              <h4 class="font-semibold text-green-300 mb-2">Mathematics</h4>
+              <div class="text-sm text-gray-300" id="mathsComparison"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6 mb-8">
+        <div class="mb-4">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-start"
+            >
+              <div class="flex items-center space-x-2">
+                <i class="fas fa-question-circle text-green-400 text-2xl"></i>
+                <h2 class="text-2xl font-bold text-white">
+                  Question-wise Analysis
+                </h2>
+              </div>
+              <p class="text-sm text-gray-400 mt-1 sm:mt-0 sm:ml-4">
+                (Click on any image to view question details)
+              </p>
+            </div>
+            <div class="ml-auto">
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-600/30"
+              >
+                Updates after every 6 hr
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button
+            onclick="showSubjectAnalysis('physics', this)"
+            class="analysis-toggle-btn bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300 active"
+          >
+            <i class="fas fa-atom mr-2"></i>Physics
+          </button>
+          <button
+            onclick="showSubjectAnalysis('chemistry', this)"
+            class="analysis-toggle-btn bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300"
+          >
+            <i class="fas fa-vial mr-2"></i>Chemistry
+          </button>
+          <button
+            onclick="showSubjectAnalysis('maths', this)"
+            class="analysis-toggle-btn bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300"
+          >
+            <i class="fas fa-square-root-alt mr-2"></i>Mathematics
+          </button>
+        </div>
+
+        <div id="questionAnalysisContainer">
+          <div id="physics-analysis" class="subject-analysis">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-600">
+                    <th class="text-left py-3 px-4">Question</th>
+                    <th class="text-center py-3 px-4">Paper</th>
+                    <th class="text-center py-3 px-4">Section</th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('correct', this)"
+                    >
+                      Correct %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('incorrect', this)"
+                    >
+                      Incorrect %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('partial', this)"
+                    >
+                      Partial %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('unattempted', this)"
+                    >
+                      Unattempted %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <!--<th class="text-left py-3 px-4">Performance</th>-->
+                  </tr>
+                </thead>
+                <tbody id="physics-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="chemistry-analysis" class="subject-analysis hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-600">
+                    <th class="text-left py-3 px-4">Question</th>
+                    <th class="text-center py-3 px-4">Paper</th>
+                    <th class="text-center py-3 px-4">Section</th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('correct', this)"
+                    >
+                      Correct %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('incorrect', this)"
+                    >
+                      Incorrect %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('partial', this)"
+                    >
+                      Partial %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('unattempted', this)"
+                    >
+                      Unattempted %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="chemistry-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="maths-analysis" class="subject-analysis hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-600">
+                    <th class="text-left py-3 px-4">Question</th>
+                    <th class="text-center py-3 px-4">Paper</th>
+                    <th class="text-center py-3 px-4">Section</th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('correct', this)"
+                    >
+                      Correct %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('incorrect', this)"
+                    >
+                      Incorrect %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('partial', this)"
+                    >
+                      Partial %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                    <th
+                      class="text-right py-3 px-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                      onclick="sortTable('unattempted', this)"
+                    >
+                      Unattempted %
+                      <i class="fas fa-sort ml-1 text-gray-400"></i>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="maths-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6 mb-8">
+        <div class="mb-4">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-start"
+            >
+              <div class="flex items-center space-x-2">
+                <i class="fas fa-chart-line text-purple-400 text-2xl"></i>
+                <h2 class="text-2xl font-bold text-white">
+                  Performance Extremes Analysis
+                </h2>
+              </div>
+              <p class="text-sm text-gray-400 mt-1 sm:mt-0 sm:ml-4">
+                (Click on any image to view question details)
+              </p>
+            </div>
+            <div class="ml-auto">
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-600/30"
+              >
+                Updates after every 6 hr
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button
+            onclick="populatePerformanceExtremes('physics', this)"
+            class="subject-toggle-btn active bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300"
+          >
+            <i class="fas fa-atom mr-2"></i>Physics
+          </button>
+          <button
+            onclick="populatePerformanceExtremes('chemistry', this)"
+            class="subject-toggle-btn bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300"
+          >
+            <i class="fas fa-vial mr-2"></i>Chemistry
+          </button>
+          <button
+            onclick="populatePerformanceExtremes('maths', this)"
+            class="subject-toggle-btn bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 px-4 py-2 rounded-lg border border-gray-600/30 transition-all duration-300"
+          >
+            <i class="fas fa-square-root-alt mr-2"></i>Mathematics
+          </button>
+        </div>
+        <div id="physics-extremes" class="subject-extremes">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div
+                class="bg-green-500/10 p-4 rounded-lg border border-green-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-green-300">
+                    Highest Correct Rate
+                  </h4>
+                  <span
+                    class="text-green-400 font-bold"
+                    id="physics-highest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="physics-highest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="physics-highest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="physics-highest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="physics-highest-correct-count">0</span> students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="physics-highest-correct-bar"
+                        class="bg-green-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-red-500/10 p-4 rounded-lg border border-red-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-red-300">
+                    Highest Incorrect Rate
+                  </h4>
+                  <span
+                    class="text-red-400 font-bold"
+                    id="physics-highest-incorrect-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="physics-highest-incorrect-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="physics-highest-incorrect-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="physics-highest-incorrect-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Incorrect:
+                      <span id="physics-highest-incorrect-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="physics-highest-incorrect-bar"
+                        class="bg-red-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div
+                class="bg-orange-500/10 p-4 rounded-lg border border-orange-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-orange-300">
+                    Lowest Correct Rate
+                  </h4>
+                  <span
+                    class="text-orange-400 font-bold"
+                    id="physics-lowest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="physics-lowest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="physics-lowest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="physics-lowest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="physics-lowest-correct-count">0</span> students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="physics-lowest-correct-bar"
+                        class="bg-orange-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-yellow-500/10 p-4 rounded-lg border border-yellow-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-yellow-300">Most Avoided</h4>
+                  <span
+                    class="text-yellow-400 font-bold"
+                    id="physics-highest-unattempted-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="physics-highest-unattempted-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="physics-highest-unattempted-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="physics-highest-unattempted-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Unattempted:
+                      <span id="physics-highest-unattempted-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="physics-highest-unattempted-bar"
+                        class="bg-yellow-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chemistry-extremes" class="subject-extremes hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div
+                class="bg-green-500/10 p-4 rounded-lg border border-green-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-green-300">
+                    Highest Correct Rate
+                  </h4>
+                  <span
+                    class="text-green-400 font-bold"
+                    id="chemistry-highest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="chemistry-highest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="chemistry-highest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="chemistry-highest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="chemistry-highest-correct-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="chemistry-highest-correct-bar"
+                        class="bg-green-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-red-500/10 p-4 rounded-lg border border-red-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-red-300">
+                    Highest Incorrect Rate
+                  </h4>
+                  <span
+                    class="text-red-400 font-bold"
+                    id="chemistry-highest-incorrect-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="chemistry-highest-incorrect-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="chemistry-highest-incorrect-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="chemistry-highest-incorrect-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Incorrect:
+                      <span id="chemistry-highest-incorrect-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="chemistry-highest-incorrect-bar"
+                        class="bg-red-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div
+                class="bg-orange-500/10 p-4 rounded-lg border border-orange-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-orange-300">
+                    Lowest Correct Rate
+                  </h4>
+                  <span
+                    class="text-orange-400 font-bold"
+                    id="chemistry-lowest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="chemistry-lowest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="chemistry-lowest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="chemistry-lowest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="chemistry-lowest-correct-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="chemistry-lowest-correct-bar"
+                        class="bg-orange-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-yellow-500/10 p-4 rounded-lg border border-yellow-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-yellow-300">Most Avoided</h4>
+                  <span
+                    class="text-yellow-400 font-bold"
+                    id="chemistry-highest-unattempted-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="chemistry-highest-unattempted-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="chemistry-highest-unattempted-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="chemistry-highest-unattempted-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Unattempted:
+                      <span id="chemistry-highest-unattempted-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="chemistry-highest-unattempted-bar"
+                        class="bg-yellow-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="maths-extremes" class="subject-extremes hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div
+                class="bg-green-500/10 p-4 rounded-lg border border-green-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-green-300">
+                    Highest Correct Rate
+                  </h4>
+                  <span
+                    class="text-green-400 font-bold"
+                    id="maths-highest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="maths-highest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="maths-highest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="maths-highest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="maths-highest-correct-count">0</span> students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="maths-highest-correct-bar"
+                        class="bg-green-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-red-500/10 p-4 rounded-lg border border-red-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-red-300">
+                    Highest Incorrect Rate
+                  </h4>
+                  <span
+                    class="text-red-400 font-bold"
+                    id="maths-highest-incorrect-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="maths-highest-incorrect-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="maths-highest-incorrect-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="maths-highest-incorrect-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Incorrect:
+                      <span id="maths-highest-incorrect-count">0</span> students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="maths-highest-incorrect-bar"
+                        class="bg-red-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div
+                class="bg-orange-500/10 p-4 rounded-lg border border-orange-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-orange-300">
+                    Lowest Correct Rate
+                  </h4>
+                  <span
+                    class="text-orange-400 font-bold"
+                    id="maths-lowest-correct-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="maths-lowest-correct-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="maths-lowest-correct-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="maths-lowest-correct-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Correct:
+                      <span id="maths-lowest-correct-count">0</span> students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="maths-lowest-correct-bar"
+                        class="bg-orange-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-yellow-500/10 p-4 rounded-lg border border-yellow-500/20"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-yellow-300">Most Avoided</h4>
+                  <span
+                    class="text-yellow-400 font-bold"
+                    id="maths-highest-unattempted-rate"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center space-x-4">
+                  <img
+                    id="maths-highest-unattempted-question"
+                    src=""
+                    alt="Question"
+                    class="w-20 h-16 object-contain bg-white rounded border"
+                  />
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-300">
+                      <span class="font-medium">Paper:</span>
+                      <span id="maths-highest-unattempted-paper">-</span> |
+                      <span class="font-medium">Section:</span>
+                      <span id="maths-highest-unattempted-section">-</span>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      Unattempted:
+                      <span id="maths-highest-unattempted-count">0</span>
+                      students
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        id="maths-highest-unattempted-bar"
+                        class="bg-yellow-400 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="questionModal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden"
+      >
+        <div
+          class="bg-gray-800 rounded-xl max-w-4xl max-h-[90vh] w-full mx-4 overflow-y-auto"
+        >
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-600"
+          >
+            <div class="flex items-center space-x-3">
+              <i class="fas fa-question-circle text-blue-400 text-xl"></i>
+              <h3 class="text-xl font-bold text-white">Question Details</h3>
+              <span
+                id="modalQuestionNumber"
+                class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm"
+              ></span>
+            </div>
+            <button
+              onclick="closeQuestionModal()"
+              class="text-gray-400 hover:text-white transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div class="p-6">
+            <div class="mb-6">
+              <div class="flex flex-wrap gap-3 mb-4">
+                <span
+                  class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm"
+                >
+                  <i class="fas fa-file-alt mr-1"></i>
+                  Paper: <span id="modalPaperNo">-</span>
+                </span>
+                <span
+                  class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm"
+                >
+                  <i class="fas fa-list mr-1"></i>
+                  Section: <span id="modalSection">-</span>
+                </span>
+                <span
+                  id="modalSubject"
+                  class="px-3 py-1 bg-orange-500/20 text-orange-300 rounded-full text-sm"
+                >
+                  <i class="fas fa-book mr-1"></i>
+                  Subject: -
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div
+                  class="bg-green-500/10 p-3 rounded-lg border border-green-500/20 text-center"
+                >
+                  <div
+                    class="text-green-400 font-bold text-lg"
+                    id="modalCorrectPct"
+                  >
+                    0%
+                  </div>
+                  <div class="text-xs text-gray-400">Correct</div>
+                </div>
+                <div
+                  class="bg-red-500/10 p-3 rounded-lg border border-red-500/20 text-center"
+                >
+                  <div
+                    class="text-red-400 font-bold text-lg"
+                    id="modalIncorrectPct"
+                  >
+                    0%
+                  </div>
+                  <div class="text-xs text-gray-400">Incorrect</div>
+                </div>
+                <div
+                  class="bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20 text-center"
+                >
+                  <div
+                    class="text-yellow-400 font-bold text-lg"
+                    id="modalPartialPct"
+                  >
+                    0%
+                  </div>
+                  <div class="text-xs text-gray-400">Partial</div>
+                </div>
+                <div
+                  class="bg-gray-500/10 p-3 rounded-lg border border-gray-500/20 text-center"
+                >
+                  <div
+                    class="text-gray-400 font-bold text-lg"
+                    id="modalUnattemptedPct"
+                  >
+                    0%
+                  </div>
+                  <div class="text-xs text-gray-400">Unattempted</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-gray-700/50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold mb-3 flex items-center">
+                  <i class="fas fa-question mr-2 text-blue-400"></i>
+                  Question
+                </h4>
+                <div class="bg-white p-4 rounded-lg">
+                  <img
+                    id="modalQuestionImg"
+                    src=""
+                    alt="Question"
+                    class="w-full h-auto max-h-96 object-contain mx-auto"
+                  />
+                </div>
+              </div>
+
+              <div class="bg-gray-700/50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold mb-3 flex items-center">
+                  <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                  Correct Answer
+                </h4>
+                <div class="bg-white p-4 rounded-lg">
+                  <div id="modalAnswerImgContainer" class="space-y-4"></div>
+                  <!--<img id="modalAnswerImg" src="" alt="Answer"
+                                    class="w-full h-auto max-h-96 object-contain mx-auto">-->
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                class="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20"
+              >
+                <h5 class="font-semibold text-blue-300 mb-2">
+                  Student Responses
+                </h5>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span class="text-sm text-gray-300">Correct:</span>
+                    <span
+                      class="text-sm font-medium text-green-400"
+                      id="modalCorrectCount"
+                      >0</span
+                    >
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-sm text-gray-300">Incorrect:</span>
+                    <span
+                      class="text-sm font-medium text-red-400"
+                      id="modalIncorrectCount"
+                      >0</span
+                    >
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-sm text-gray-300">Partial:</span>
+                    <span
+                      class="text-sm font-medium text-yellow-400"
+                      id="modalPartialCount"
+                      >0</span
+                    >
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-sm text-gray-300">Unattempted:</span>
+                    <span
+                      class="text-sm font-medium text-gray-400"
+                      id="modalUnattemptedCount"
+                      >0</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-purple-500/10 p-4 rounded-lg border border-purple-500/20"
+              >
+                <h5 class="font-semibold text-purple-300 mb-2">
+                  Performance Analysis
+                </h5>
+                <div class="space-y-2">
+                  <div class="text-sm text-gray-300">Difficulty Level:</div>
+                  <div id="modalDifficultyLevel" class="text-sm font-medium">
+                    -
+                  </div>
+                  <div class="w-full bg-gray-600 rounded-full h-2 mt-2">
+                    <div
+                      id="modalPerformanceBar"
+                      class="h-2 rounded-full transition-all duration-300"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center">
+          <i class="fas fa-crown mr-3 text-yellow-400"></i>
+          Top Performers (250+)
+        </h2>
+        <div class="grid gap-4" id="leaderboard"></div>
+      </div>
+    </div>
+
+    <div
+      id="errorModal"
+      class="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center hidden"
+    >
+      <div
+        class="bg-gray-800 p-6 sm:p-8 rounded-xl max-w-sm sm:max-w-md mx-4 text-center border border-gray-600 shadow-2xl"
+      >
+        <div class="mb-6">
+          <div
+            class="mx-auto w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-500/30"
+          >
+            <i
+              class="fas fa-sync-alt text-yellow-400 text-2xl animate-spin"
+            ></i>
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-4">Stats Are Updating !</h2>
+        <p class="text-gray-300 mb-6 leading-relaxed">
+          Please check back in a few minutes while the data is being refreshed.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      let apiData = null;
+      let chartInstance = null;
+      let isChartView = false;
+
+      async function fetchData() {
+        const Url = "https://adv-stats-api.iitjeepritam.workers.dev/stats";
+        const proxyUrl = `https://cors-proxy.novadrone16.workers.dev?url=${encodeURIComponent(
+          Url
+        )}`;
+        try {
+          const response = await fetch(proxyUrl);
+          if (!response.ok) {
+            document.getElementById("errorModal").classList.remove("hidden");
+            return;
+          }
+          apiData = await response.json();
+          displayData();
+        } catch (error) {
+          document.getElementById("errorModal").classList.remove("hidden");
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      function displayData() {
+        const lastUpdated = new Date(apiData.lastUpdated);
+
+        const year = lastUpdated.getUTCFullYear();
+        const month = (lastUpdated.getUTCMonth() + 1)
+          .toString()
+          .padStart(2, "0");
+        const day = lastUpdated.getUTCDate().toString().padStart(2, "0");
+
+        let hours = lastUpdated.getUTCHours();
+        const minutes = lastUpdated.getUTCMinutes().toString().padStart(2, "0");
+
+        const ampm = hours >= 12 ? "pm" : "am";
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+
+        document.getElementById(
+          "lastUpdated"
+        ).textContent = `Last Updated: ${day}/${month}/${year} ${hours}:${minutes}${ampm}`;
+
+        document.getElementById("totalCount").textContent =
+          apiData.totalStats.totalCount.toLocaleString();
+        document.getElementById("activeUsers").textContent =
+          apiData.analytics.realTime.activeUsersLast30Min;
+        document.getElementById("highestScore").textContent =
+          apiData.totalStats.highestScore;
+        document.getElementById("top250Count").textContent =
+          apiData.top250PlusScorers.count;
+
+        //document.getElementById('physicsHigh').textContent = apiData.totalStats.subjectHighs.physics;
+        //document.getElementById('chemistryHigh').textContent = apiData.totalStats.subjectHighs.chemistry;
+        //document.getElementById('mathsHigh').textContent = apiData.totalStats.subjectHighs.maths;
+
+        displayDistributionTable();
+
+        displayPaperComparison();
+
+        populatePerformanceExtremes(
+          "physics",
+          document.querySelector(
+            "#questionAnalysisContainer + div .subject-toggle-btn.active"
+          )
+        );
+
+        displayLeaderboard();
+
+        showSubjectAnalysis(
+          "physics",
+          document.querySelector(".subject-toggle-btn.active")
+        );
+
+        addClickHandlersToExtremes();
+
+        const analysisBtn = document.querySelector(
+          "button[onclick*='showSubjectAnalysis'][onclick*='physics']"
+        );
+        if (analysisBtn) {
+          showSubjectAnalysis("physics", analysisBtn);
+        }
+
+        const extremesBtn = document.querySelector(
+          "button[onclick*='populatePerformanceExtremes'][onclick*='physics']"
+        );
+        if (extremesBtn) {
+          populatePerformanceExtremes("physics", extremesBtn);
+        }
+      }
+
+      function displayDistributionTable() {
+        const tbody = document.getElementById("distributionTable");
+        tbody.innerHTML = "";
+
+        Object.entries(apiData.totalStats.totalRanges).forEach(
+          ([range, count]) => {
+            const percentage = (
+              (count / apiData.totalStats.totalCount) *
+              100
+            ).toFixed(2);
+            const row = document.createElement("tr");
+            row.className = "border-b border-gray-700 hover:bg-gray-800/50";
+
+            row.innerHTML = `
+                    <td class="py-3 px-4 font-medium">${range}</td>
+                    <td class="py-3 px-4 text-right">${count.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-right">${percentage}%</td>
+                    <td class="py-3 px-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </td>
+                `;
+            tbody.appendChild(row);
+          }
+        );
+      }
+
+      function displayChart() {
+        const ctx = document
+          .getElementById("distributionChart")
+          .getContext("2d");
+
+        if (chartInstance) {
+          chartInstance.destroy();
+        }
+
+        const labels = Object.keys(apiData.totalStats.totalRanges);
+        const data = Object.values(apiData.totalStats.totalRanges);
+
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Number of Students",
+                data: data,
+                backgroundColor: "rgba(59, 130, 246, 0.8)",
+                borderColor: "rgba(59, 130, 246, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "white",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+              x: {
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function displayPaperComparison() {
+        const paperComp = apiData.paperComparison.easierPaper;
+        const total =
+          paperComp.paper1Count + paperComp.paper2Count + paperComp.equal;
+
+        const paper1Perc = ((paperComp.paper1Count / total) * 100).toFixed(1);
+        const paper2Perc = ((paperComp.paper2Count / total) * 100).toFixed(1);
+        const equalPerc = ((paperComp.equal / total) * 100).toFixed(1);
+
+        document.getElementById("paper1Percentage").textContent =
+          paper1Perc + "%";
+        document.getElementById("paper2Percentage").textContent =
+          paper2Perc + "%";
+        document.getElementById("equalPercentage").textContent =
+          equalPerc + "%";
+        document.getElementById("paper1Bar").style.width = paper1Perc + "%";
+        document.getElementById("paper2Bar").style.width = paper2Perc + "%";
+        document.getElementById("equalBar").style.width = equalPerc + "%";
+
+        const subjects = ["physics", "chemistry", "maths"];
+        subjects.forEach((subject) => {
+          const subjectData =
+            apiData.paperComparison.subjectComparison[subject];
+          const total =
+            subjectData.paper1Better +
+            subjectData.paper2Better +
+            subjectData.equal;
+          const p1Perc = ((subjectData.paper1Better / total) * 100).toFixed(0);
+          const p2Perc = ((subjectData.paper2Better / total) * 100).toFixed(0);
+
+          const analysis =
+            p1Perc > p2Perc
+              ? `${p1Perc}% of students performed better in Paper 1`
+              : `${p2Perc}% of students performed better in Paper 2`;
+
+          document.getElementById(subject + "Comparison").textContent =
+            analysis;
+        });
+      }
+
+      function showSubjectAnalysis(subject, clickedButton) {
+        document.querySelectorAll(".analysis-toggle-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        if (clickedButton) {
+          clickedButton.classList.add("active");
+        }
+
+        currentSortColumn = null;
+        currentSortDirection = "asc";
+
+        document.querySelectorAll("thead th i").forEach((icon) => {
+          icon.className = "fas fa-sort ml-1 text-gray-400";
+        });
+
+        document.querySelectorAll(".subject-analysis").forEach((div) => {
+          div.classList.add("hidden");
+        });
+
+        document
+          .getElementById(subject + "-analysis")
+          .classList.remove("hidden");
+        if (clickedButton) {
+          clickedButton.classList.add("active");
+        }
+
+        populateQuestionTable(subject);
+      }
+
+      let currentSortColumn = null;
+      let currentSortDirection = "asc";
+      let currentSubjectData = null;
+
+      function populateQuestionTable(subject) {
+        currentSubjectData = subject;
+        const tbody = document.getElementById(subject + "-table-body");
+        tbody.innerHTML = "";
+
+        if (
+          apiData &&
+          apiData.questionStats &&
+          apiData.questionStats[subject] &&
+          apiData.questionStats[subject].questionStats
+        ) {
+          let questions = [...apiData.questionStats[subject].questionStats];
+
+          if (currentSortColumn) {
+            questions = sortQuestionData(
+              questions,
+              currentSortColumn,
+              currentSortDirection
+            );
+          }
+
+          questions.forEach((question, index) => {
+            const row = document.createElement("tr");
+            row.className = "border-b border-gray-700 hover:bg-gray-800/50";
+
+            const performanceClass =
+              parseFloat(question.correctPct) > 40
+                ? "text-green-400"
+                : parseFloat(question.correctPct) > 20
+                ? "text-yellow-400"
+                : "text-red-400";
+
+            const originalIndex = apiData.questionStats[
+              subject
+            ].questionStats.findIndex((q) => q.qid === question.qid);
+
+            row.innerHTML = `
+                <td class="py-3 px-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="${question.questionImg}" alt="Q${
+              originalIndex + 1
+            }"
+                             class="w-12 h-10 object-contain bg-white rounded border cursor-pointer hover:scale-105 transition-transform"
+                             onclick="openQuestionModal(apiData.questionStats['${subject}'].questionStats[${originalIndex}], ${
+              originalIndex + 1
+            }, '${subject}')">
+                        <span class="font-medium">Q${originalIndex + 1}</span>
+                    </div>
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <span class="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs">${
+                      question.paperNo
+                    }</span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <span class="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">${
+                      question.section
+                    }</span>
+                </td>
+                <td class="py-3 px-4 text-right font-semibold text-green-400">${
+                  question.correctPct
+                }%</td>
+                <td class="py-3 px-4 text-right font-semibold text-red-400">${
+                  question.incorrectPct
+                }%</td>
+                <td class="py-3 px-4 text-right font-semibold text-yellow-400">${
+                  question.partialCorrectPct
+                }%</td>
+                <td class="py-3 px-4 text-right font-semibold text-gray-400">${
+                  question.unattemptedPct
+                }%</td>
+                <!--<td class="py-3 px-4">
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="h-2 rounded-full ${performanceClass.replace(
+                          "text-",
+                          "bg-"
+                        )}"
+                             style="width: ${question.correctPct}%"></div>
+                    </div>
+                </td>-->
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      }
+
+      function sortTable(column, headerElement) {
+        document.querySelectorAll("thead th i").forEach((icon) => {
+          icon.className = "fas fa-sort ml-1 text-gray-400";
+        });
+
+        if (currentSortColumn === column) {
+          currentSortDirection =
+            currentSortDirection === "asc" ? "desc" : "asc";
+        } else {
+          currentSortDirection = "asc";
+          currentSortColumn = column;
+        }
+
+        const icon = headerElement.querySelector("i");
+        if (currentSortDirection === "asc") {
+          icon.className = "fas fa-sort-up ml-1 text-blue-400";
+        } else {
+          icon.className = "fas fa-sort-down ml-1 text-blue-400";
+        }
+
+        populateQuestionTable(currentSubjectData);
+      }
+
+      function sortQuestionData(questions, column, direction) {
+        return questions.sort((a, b) => {
+          let valueA, valueB;
+
+          switch (column) {
+            case "correct":
+              valueA = parseFloat(a.correctPct);
+              valueB = parseFloat(b.correctPct);
+              break;
+            case "incorrect":
+              valueA = parseFloat(a.incorrectPct);
+              valueB = parseFloat(b.incorrectPct);
+              break;
+            case "partial":
+              valueA = parseFloat(a.partialCorrectPct);
+              valueB = parseFloat(b.partialCorrectPct);
+              break;
+            case "unattempted":
+              valueA = parseFloat(a.unattemptedPct);
+              valueB = parseFloat(b.unattemptedPct);
+              break;
+            default:
+              return 0;
+          }
+
+          if (direction === "asc") {
+            return valueA - valueB;
+          } else {
+            return valueB - valueA;
+          }
+        });
+      }
+
+      function addClickHandlersToExtremes() {
+        const subjects = ["physics", "chemistry", "maths"];
+
+        subjects.forEach((subject) => {
+          const subjectData = apiData?.questionStats?.[subject];
+          if (!subjectData) return;
+
+          const prefix = subject + "-";
+
+          document.getElementById(prefix + "highest-correct-question").onclick =
+            function () {
+              openQuestionModal(subjectData.highestCorrect, "HC", subject);
+            };
+
+          document.getElementById(prefix + "lowest-correct-question").onclick =
+            function () {
+              openQuestionModal(subjectData.lowestCorrect, "LC", subject);
+            };
+
+          document.getElementById(
+            prefix + "highest-incorrect-question"
+          ).onclick = function () {
+            openQuestionModal(subjectData.highestIncorrect, "HI", subject);
+          };
+
+          document.getElementById(
+            prefix + "highest-unattempted-question"
+          ).onclick = function () {
+            openQuestionModal(subjectData.highestUnattempted, "HU", subject);
+          };
+
+          [
+            "highest-correct-question",
+            "lowest-correct-question",
+            "highest-incorrect-question",
+            "highest-unattempted-question",
+          ].forEach((type) => {
+            const el = document.getElementById(prefix + type);
+            if (el) {
+              el.classList.add(
+                "cursor-pointer",
+                "hover:scale-105",
+                "transition-transform"
+              );
+            }
+          });
+        });
+      }
+
+      function populatePerformanceExtremes(subject, clickedButton = null) {
+        document.querySelectorAll(".subject-extremes").forEach((div) => {
+          div.classList.add("hidden");
+        });
+
+        document.querySelectorAll(".subject-toggle-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        document
+          .getElementById(`${subject}-extremes`)
+          .classList.remove("hidden");
+
+        if (clickedButton) {
+          clickedButton.classList.add("active");
+        }
+        if (
+          !apiData ||
+          !apiData.questionStats ||
+          !apiData.questionStats[subject]
+        ) {
+          console.warn(
+            `API data for performance extremes for subject ${subject} is not available.`
+          );
+          return;
+        }
+
+        const subjectData = apiData.questionStats[subject];
+
+        const highestCorrect = subjectData.highestCorrect;
+        if (highestCorrect) {
+          document.getElementById(
+            `${subject}-highest-correct-rate`
+          ).textContent = highestCorrect.correctPct + "%";
+          document.getElementById(`${subject}-highest-correct-question`).src =
+            highestCorrect.questionImg;
+          document.getElementById(
+            `${subject}-highest-correct-paper`
+          ).textContent = highestCorrect.paperNo;
+          document.getElementById(
+            `${subject}-highest-correct-section`
+          ).textContent = highestCorrect.section;
+          document.getElementById(
+            `${subject}-highest-correct-count`
+          ).textContent = highestCorrect.correctCount
+            ? highestCorrect.correctCount.toLocaleString()
+            : "N/A";
+          document.getElementById(
+            `${subject}-highest-correct-bar`
+          ).style.width = highestCorrect.correctPct + "%";
+        }
+
+        const lowestCorrect = subjectData.lowestCorrect;
+        if (lowestCorrect) {
+          document.getElementById(
+            `${subject}-lowest-correct-rate`
+          ).textContent = lowestCorrect.correctPct + "%";
+          document.getElementById(`${subject}-lowest-correct-question`).src =
+            lowestCorrect.questionImg;
+          document.getElementById(
+            `${subject}-lowest-correct-paper`
+          ).textContent = lowestCorrect.paperNo;
+          document.getElementById(
+            `${subject}-lowest-correct-section`
+          ).textContent = lowestCorrect.section;
+          document.getElementById(
+            `${subject}-lowest-correct-count`
+          ).textContent = lowestCorrect.correctCount
+            ? lowestCorrect.correctCount.toLocaleString()
+            : "N/A";
+          document.getElementById(`${subject}-lowest-correct-bar`).style.width =
+            lowestCorrect.correctPct + "%";
+        }
+
+        const highestIncorrect = subjectData.highestIncorrect;
+        if (highestIncorrect) {
+          document.getElementById(
+            `${subject}-highest-incorrect-rate`
+          ).textContent = highestIncorrect.incorrectPct + "%";
+          document.getElementById(`${subject}-highest-incorrect-question`).src =
+            highestIncorrect.questionImg;
+          document.getElementById(
+            `${subject}-highest-incorrect-paper`
+          ).textContent = highestIncorrect.paperNo;
+          document.getElementById(
+            `${subject}-highest-incorrect-section`
+          ).textContent = highestIncorrect.section;
+          document.getElementById(
+            `${subject}-highest-incorrect-count`
+          ).textContent = highestIncorrect.incorrectCount
+            ? highestIncorrect.incorrectCount.toLocaleString()
+            : "N/A";
+          document.getElementById(
+            `${subject}-highest-incorrect-bar`
+          ).style.width = highestIncorrect.incorrectPct + "%";
+        }
+
+        const highestUnattempted = subjectData.highestUnattempted;
+        if (highestUnattempted) {
+          document.getElementById(
+            `${subject}-highest-unattempted-rate`
+          ).textContent = highestUnattempted.unattemptedPct + "%";
+          document.getElementById(
+            `${subject}-highest-unattempted-question`
+          ).src = highestUnattempted.questionImg;
+          document.getElementById(
+            `${subject}-highest-unattempted-paper`
+          ).textContent = highestUnattempted.paperNo;
+          document.getElementById(
+            `${subject}-highest-unattempted-section`
+          ).textContent = highestUnattempted.section;
+          document.getElementById(
+            `${subject}-highest-unattempted-count`
+          ).textContent = highestUnattempted.unattemptedCount
+            ? highestUnattempted.unattemptedCount.toLocaleString()
+            : "N/A";
+          document.getElementById(
+            `${subject}-highest-unattempted-bar`
+          ).style.width = highestUnattempted.unattemptedPct + "%";
+        }
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `
+    .analysis-toggle-btn.active {
+        background-color: rgba(234, 179, 8, 0.2) !important;
+        border-color: rgba(234, 179, 8, 0.5) !important;
+        color: rgb(250, 204, 21) !important;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2);
+    }
+    .subject-toggle-btn.active {
+        background-color: rgba(234, 179, 8, 0.2) !important;
+        border-color: rgba(234, 179, 8, 0.5) !important;
+        color: rgb(250, 204, 21) !important;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2);
+    }
+`;
+      document.head.appendChild(style);
+
+      function openQuestionModal(questionData, questionNumber, subject) {
+        const modal = document.getElementById("questionModal");
+
+        document.getElementById(
+          "modalQuestionNumber"
+        ).textContent = `Q${questionNumber}`;
+        document.getElementById("modalPaperNo").textContent =
+          questionData.paperNo;
+        document.getElementById("modalSection").textContent =
+          questionData.section;
+        document.getElementById("modalSubject").textContent =
+          subject.charAt(0).toUpperCase() + subject.slice(1);
+
+        document.getElementById("modalCorrectPct").textContent =
+          questionData.correctPct + "%";
+        document.getElementById("modalIncorrectPct").textContent =
+          questionData.incorrectPct + "%";
+        document.getElementById("modalPartialPct").textContent =
+          questionData.partialCorrectPct + "%";
+        document.getElementById("modalUnattemptedPct").textContent =
+          questionData.unattemptedPct + "%";
+
+        document.getElementById("modalQuestionImg").src =
+          questionData.questionImg;
+
+        const answerContainer = document.getElementById(
+          "modalAnswerImgContainer"
+        );
+        answerContainer.innerHTML = "";
+
+        if (
+          questionData.correctAnswerImg &&
+          questionData.correctAnswerImg.length > 0
+        ) {
+          questionData.correctAnswerImg.forEach((imgUrl) => {
+            const img = document.createElement("img");
+            img.src = imgUrl;
+            img.alt = "Correct Answer";
+            img.className =
+              "w-full h-auto max-h-96 object-contain mx-auto bg-white rounded-lg border border-gray-400 p-2 shadow-sm";
+            answerContainer.appendChild(img);
+          });
+        } else {
+          const fallback = document.createElement("div");
+          fallback.textContent = `${questionData.correctAnswerId || "N/A"}`;
+          fallback.className =
+            "text-gray-800 text-center text-lg font-semibold";
+          answerContainer.appendChild(fallback);
+        }
+
+        document.getElementById("modalCorrectCount").textContent = (
+          questionData.correctCount || 0
+        ).toLocaleString();
+        document.getElementById("modalIncorrectCount").textContent = (
+          questionData.incorrectCount || 0
+        ).toLocaleString();
+        document.getElementById("modalPartialCount").textContent = (
+          questionData.partialCount || 0
+        ).toLocaleString();
+        document.getElementById("modalUnattemptedCount").textContent = (
+          questionData.unattemptedCount || 0
+        ).toLocaleString();
+
+        const correctRate = parseFloat(questionData.correctPct);
+        let difficultyLevel, difficultyColor;
+
+        if (correctRate >= 70) {
+          difficultyLevel = "Easy";
+          difficultyColor = "bg-green-400";
+        } else if (correctRate >= 40) {
+          difficultyLevel = "Medium";
+          difficultyColor = "bg-yellow-400";
+        } else if (correctRate >= 20) {
+          difficultyLevel = "Hard";
+          difficultyColor = "bg-orange-400";
+        } else {
+          difficultyLevel = "Very Hard";
+          difficultyColor = "bg-red-400";
+        }
+
+        document.getElementById("modalDifficultyLevel").textContent =
+          difficultyLevel;
+        document.getElementById(
+          "modalDifficultyLevel"
+        ).className = `text-sm font-medium ${difficultyColor.replace(
+          "bg-",
+          "text-"
+        )}`;
+
+        const performanceBar = document.getElementById("modalPerformanceBar");
+        performanceBar.className = `h-2 rounded-full transition-all duration-300 ${difficultyColor}`;
+        performanceBar.style.width = questionData.correctPct + "%";
+
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeQuestionModal() {
+        const modal = document.getElementById("questionModal");
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+      }
+
+      document
+        .getElementById("questionModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeQuestionModal();
+          }
+        });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeQuestionModal();
+        }
+      });
+
+      function displayLeaderboard() {
+        const leaderboard = document.getElementById("leaderboard");
+        leaderboard.innerHTML = "";
+
+        apiData.top250PlusScorers.students.forEach((student, index) => {
+          const item = document.createElement("div");
+          item.className = "leaderboard-item p-4 rounded-lg";
+          item.style.animationDelay = `${index * 0.1}s`;
+
+          const rankIcon =
+            index < 3 ? ["🥇", "🥈", "🥉"][index] : `#${student.rank}`;
+
+          item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-2xl font-bold w-12 text-center">
+                                ${rankIcon}
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">${student.totalMarks} marks</div>
+                                <div class="text-sm text-gray-400">
+                                    P1: ${student.paper1Marks} | P2: ${student.paper2Marks} | Positive: ${student.positiveScore}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-300">
+                                <span class="text-red-300">P: ${student.physicsScore}</span> |
+                                <span class="text-blue-300">C: ${student.chemistryScore}</span> |
+                                <span class="text-green-300">M: ${student.mathsScore}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+          leaderboard.appendChild(item);
+        });
+      }
+
+      document
+        .getElementById("toggleView")
+        .addEventListener("click", function () {
+          const tableView = document.getElementById("tableView");
+          const chartView = document.getElementById("chartView");
+          const toggleBtn = document.getElementById("toggleView");
+
+          if (isChartView) {
+            tableView.classList.remove("hidden");
+            chartView.classList.add("hidden");
+            toggleBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
+            isChartView = false;
+          } else {
+            tableView.classList.add("hidden");
+            chartView.classList.remove("hidden");
+            toggleBtn.innerHTML = '<i class="fas fa-table"></i>';
+            displayChart();
+            isChartView = true;
+          }
+        });
+      document.addEventListener("DOMContentLoaded", function () {
+        addClickHandlersToExtremes();
+      });
+
+      fetchData();
+      addClickHandlersToExtremes();
+    </script>
+  </body>
 </html>
