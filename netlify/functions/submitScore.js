@@ -21,6 +21,7 @@ export async function handler(event) {
             headers: {
                 "Content-Type": "application/json",
                 "X-Worker-Key": WORKER_SECRET_KEY,
+                "Origin": "https://j2025scorecard.netlify.app",
             },
             body: JSON.stringify(body.payload),
         });
