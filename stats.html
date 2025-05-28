@@ -278,6 +278,88 @@
         </div>
       </div>
 
+      <div class="card rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-chart-bar mr-3 text-blue-400"></i>
+            Latest Score Distribution
+          </h2>
+          <button
+            id="toggleViewrecent"
+            class="toggle-btn px-4 py-2 rounded-lg text-white font-semibold flex items-center"
+          >
+            <i class="fas fa-table"></i>
+          </button>
+        </div>
+
+        <p class="text-sm text-gray-400 mt-1 sm:mt-0 sm:ml-4 mb-6" id="recentDistributionCount">
+            Score distribution after the marks calculator updated with the prov key, includes users who recalculated their marks and new users.
+        </p>
+
+        <div id="tableViewrecent">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-600">
+                  <th class="text-left py-3 px-4">Score Range</th>
+                  <th class="text-right py-3 px-4">Students</th>
+                  <th class="text-right py-3 px-4">Percentage</th>
+                  <th class="text-left py-3 px-4">Distribution</th>
+                </tr>
+              </thead>
+              <tbody id="distributionTablerecent"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="chartViewrecent" class="hidden">
+          <div class="chart-container">
+            <canvas id="distributionChartrecent"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-chart-bar mr-3 text-blue-400"></i>
+            Old Score Distribution
+          </h2>
+          <button
+            id="toggleViewold"
+            class="toggle-btn px-4 py-2 rounded-lg text-white font-semibold flex items-center"
+          >
+            <i class="fas fa-table"></i>
+          </button>
+        </div>
+
+        <p class="text-sm text-gray-400 mt-1 sm:mt-0 sm:ml-4 mb-6" id="oldDistributionCount">
+            
+        </p>
+
+        <div id="tableViewold">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-600">
+                  <th class="text-left py-3 px-4">Score Range</th>
+                  <th class="text-right py-3 px-4">Students</th>
+                  <th class="text-right py-3 px-4">Percentage</th>
+                  <th class="text-left py-3 px-4">Distribution</th>
+                </tr>
+              </thead>
+              <tbody id="distributionTableold"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="chartViewold" class="hidden">
+          <div class="chart-container">
+            <canvas id="distributionChartold"></canvas>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="card rounded-xl p-6">
           <h2 class="text-2xl font-bold mb-6 flex items-center">
@@ -1248,7 +1330,7 @@
                   Correct Answer
                 </h4>
                 <div class="bg-white p-4 rounded-lg">
-                  <div id="modalAnswerImgContainer" class="space-y-4"></div>
+                  <div id="modalAnswerImgContainer" class="space-y-4" style="white-space: normal;overflow: auto;"></div>
                   <!--<img id="modalAnswerImg" src="" alt="Answer"
                                     class="w-full h-auto max-h-96 object-contain mx-auto">-->
                 </div>
@@ -1358,7 +1440,11 @@
     <script>
       let apiData = null;
       let chartInstance = null;
+      let chartInstancerecent = null;
+      let chartInstanceold = null;
       let isChartView = false;
+      let isChartViewrecent = false;
+      let isChartViewold = false;
 
       async function fetchData() {
         const Url = "https://adv-stats-api.iitjeepritam.workers.dev/stats";
@@ -1407,12 +1493,32 @@
           apiData.totalStats.highestScore;
         document.getElementById("top250Count").textContent =
           apiData.top250PlusScorers.count;
+        const totalCount = apiData.totalStats.totalCount.toLocaleString();
+        const recentDistributionCount = apiData.recentDistribution.totalCount.toLocaleString();
+        const oldDistributionCount = apiData.oldDistribution.totalCount.toLocaleString();
+        const recentPercentage = (
+          (apiData.recentDistribution.totalCount /
+            apiData.totalStats.totalCount) *
+          100
+        ).toFixed(2);
+        const notRecalculatedPercentage = (
+          ((apiData.totalStats.totalCount -
+            apiData.recentDistribution.totalCount) /
+          apiData.totalStats.totalCount) *
+          100
+        ).toFixed(2);
+        document.getElementById("recentDistributionCount").innerHTML =
+          `<b>Note:</b> The latest score distribution reflects students who recalculated their marks and new users after the prov key update (${recentDistributionCount} out of ${totalCount} students, or ${recentPercentage}%). Approximately ${notRecalculatedPercentage}% of students have not recalculated their scores. This creates a significant selection bias, as higher-performing students are more likely to recalculate their marks, while lower-performing students may be less likely to do so. Therefore, the improved distribution in the latest data may not accurately represent the actual performance of the entire student cohort.`;
+        document.getElementById("oldDistributionCount").innerHTML =
+          `<b>Note:</b> The old score distribution reflects students who did not recalculate their marks after the prov key update (${oldDistributionCount} out of ${totalCount} students, or ${notRecalculatedPercentage}%). The high concentration of students in lower score ranges suggests that many low-performing students have not yet recalculated their marks using the updated provisional key, supporting the selection bias observed in the latest score distribution data.`;
 
         //document.getElementById('physicsHigh').textContent = apiData.totalStats.subjectHighs.physics;
         //document.getElementById('chemistryHigh').textContent = apiData.totalStats.subjectHighs.chemistry;
         //document.getElementById('mathsHigh').textContent = apiData.totalStats.subjectHighs.maths;
 
         displayDistributionTable();
+        displayDistributionTablerecent();
+        displayDistributionTableold();
 
         displayPaperComparison();
 
@@ -1475,6 +1581,62 @@
         );
       }
 
+      function displayDistributionTablerecent() {
+        const tbody = document.getElementById("distributionTablerecent");
+        tbody.innerHTML = "";
+
+        Object.entries(apiData.recentDistribution.totalRanges).forEach(
+          ([range, count]) => {
+            const percentage = (
+              (count / apiData.recentDistribution.totalCount) *
+              100
+            ).toFixed(2);
+            const row = document.createElement("tr");
+            row.className = "border-b border-gray-700 hover:bg-gray-800/50";
+
+            row.innerHTML = `
+                    <td class="py-3 px-4 font-medium">${range}</td>
+                    <td class="py-3 px-4 text-right">${count.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-right">${percentage}%</td>
+                    <td class="py-3 px-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </td>
+                `;
+            tbody.appendChild(row);
+          }
+        );
+      }
+
+      function displayDistributionTableold() {
+        const tbody = document.getElementById("distributionTableold");
+        tbody.innerHTML = "";
+
+        Object.entries(apiData.oldDistribution.totalRanges).forEach(
+          ([range, count]) => {
+            const percentage = (
+              (count / apiData.oldDistribution.totalCount) *
+              100
+            ).toFixed(2);
+            const row = document.createElement("tr");
+            row.className = "border-b border-gray-700 hover:bg-gray-800/50";
+
+            row.innerHTML = `
+                    <td class="py-3 px-4 font-medium">${range}</td>
+                    <td class="py-3 px-4 text-right">${count.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-right">${percentage}%</td>
+                    <td class="py-3 px-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </td>
+                `;
+            tbody.appendChild(row);
+          }
+        );
+      }
+
       function displayChart() {
         const ctx = document
           .getElementById("distributionChart")
@@ -1488,6 +1650,124 @@
         const data = Object.values(apiData.totalStats.totalRanges);
 
         chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Number of Students",
+                data: data,
+                backgroundColor: "rgba(59, 130, 246, 0.8)",
+                borderColor: "rgba(59, 130, 246, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "white",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+              x: {
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function displayChartrecent() {
+        const ctx = document
+          .getElementById("distributionChartrecent")
+          .getContext("2d");
+
+        if (chartInstancerecent) {
+          chartInstancerecent.destroy();
+        }
+
+        const labels = Object.keys(apiData.recentDistribution.totalRanges);
+        const data = Object.values(apiData.recentDistribution.totalRanges);
+
+        chartInstancerecent = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Number of Students",
+                data: data,
+                backgroundColor: "rgba(59, 130, 246, 0.8)",
+                borderColor: "rgba(59, 130, 246, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "white",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+              x: {
+                ticks: {
+                  color: "white",
+                },
+                grid: {
+                  color: "rgba(255, 255, 255, 0.1)",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function displayChartold() {
+        const ctx = document
+          .getElementById("distributionChartold")
+          .getContext("2d");
+
+        if (chartInstanceold) {
+          chartInstanceold.destroy();
+        }
+
+        const labels = Object.keys(apiData.oldDistribution.totalRanges);
+        const data = Object.values(apiData.oldDistribution.totalRanges);
+
+        chartInstanceold = new Chart(ctx, {
           type: "bar",
           data: {
             labels: labels,
@@ -2112,6 +2392,46 @@
             toggleBtn.innerHTML = '<i class="fas fa-table"></i>';
             displayChart();
             isChartView = true;
+          }
+        });
+      document
+        .getElementById("toggleViewrecent")
+        .addEventListener("click", function () {
+          const tableViewrecent = document.getElementById("tableViewrecent");
+          const chartViewrecent = document.getElementById("chartViewrecent");
+          const toggleBtnrecent = document.getElementById("toggleViewrecent");
+
+          if (isChartViewrecent) {
+            tableViewrecent.classList.remove("hidden");
+            chartViewrecent.classList.add("hidden");
+            toggleBtnrecent.innerHTML = '<i class="fas fa-chart-bar"></i>';
+            isChartViewrecent = false;
+          } else {
+            tableViewrecent.classList.add("hidden");
+            chartViewrecent.classList.remove("hidden");
+            toggleBtnrecent.innerHTML = '<i class="fas fa-table"></i>';
+            displayChartrecent();
+            isChartViewrecent = true;
+          }
+        });
+      document
+        .getElementById("toggleViewold")
+        .addEventListener("click", function () {
+          const tableViewold = document.getElementById("tableViewold");
+          const chartViewold = document.getElementById("chartViewold");
+          const toggleBtnold = document.getElementById("toggleViewold");
+
+          if (isChartViewold) {
+            tableViewold.classList.remove("hidden");
+            chartViewold.classList.add("hidden");
+            toggleBtnold.innerHTML = '<i class="fas fa-chart-bar"></i>';
+            isChartViewold = false;
+          } else {
+            tableViewold.classList.add("hidden");
+            chartViewold.classList.remove("hidden");
+            toggleBtnold.innerHTML = '<i class="fas fa-table"></i>';
+            displayChartold();
+            isChartViewold = true;
           }
         });
       document.addEventListener("DOMContentLoaded", function () {
