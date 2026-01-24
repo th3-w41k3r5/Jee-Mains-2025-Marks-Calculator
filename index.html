@@ -220,6 +220,329 @@
         .form-control::-ms-input-placeholder {
             color: #6c757d !important;
         }
+
+        .coming-soon-card {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(14, 165, 233, 0.04));
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .coming-soon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(77, 208, 225, 0.6), transparent);
+        }
+
+        .coming-soon-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1), transparent);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .coming-soon-content {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .coming-soon-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coming-soon-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+
+        .coming-soon-icon i {
+            color: white;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .coming-soon-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .coming-soon-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #4dd0e1;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .coming-soon-title {
+            font-size: 1.15rem;
+            color: #ffffff;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.3;
+            font-weight: 700;
+            word-break: break-word;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .coming-soon-desc {
+            font-size: 0.85rem;
+            color: #b3e5fc;
+            margin: 0 0 0.8rem 0;
+            line-height: 1.5;
+            word-break: break-word;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .coming-soon-highlight {
+            color: #4dd0e1;
+            font-weight: 700;
+            background: rgba(77, 208, 225, 0.15);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .coming-soon-highlight:hover {
+            background: rgba(77, 208, 225, 0.25);
+            color: #38bdf8;
+        }
+
+        .coming-soon-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 0.7rem 1.4rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.35);
+            border: none;
+            white-space: nowrap;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+
+        .coming-soon-btn i {
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+
+        .coming-soon-btn:hover {
+            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.45);
+            transform: translateY(-3px);
+        }
+
+        .coming-soon-btn:hover i {
+            transform: translateX(4px);
+        }
+
+        .coming-soon-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 480px) {
+            .coming-soon-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 12px;
+            }
+
+            .coming-soon-content {
+                gap: 0.9rem;
+            }
+
+            .coming-soon-icon {
+                width: 44px;
+                height: 44px;
+            }
+
+            .coming-soon-icon i {
+                font-size: 1.2rem;
+            }
+
+            .coming-soon-label {
+                font-size: 0.65rem;
+                letter-spacing: 1.5px;
+                margin-bottom: 0.35rem;
+            }
+
+            .coming-soon-title {
+                font-size: 1rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .coming-soon-desc {
+                font-size: 0.8rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .coming-soon-highlight {
+                padding: 0.15rem 0.4rem;
+            }
+
+            .coming-soon-btn {
+                padding: 0.6rem 1.1rem;
+                font-size: 0.82rem;
+                gap: 0.4rem;
+                border-radius: 8px;
+            }
+
+            .coming-soon-btn i {
+                font-size: 0.7rem;
+            }
+        }
+
+        .instructions-section {
+            margin-top: 1.2rem;
+        }
+
+        .instructions-step {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.9rem;
+            padding: 0.8rem;
+            background: rgba(56, 189, 248, 0.05);
+            border-left: 3px solid #38bdf8;
+            border-radius: 6px;
+        }
+
+        .step-number {
+            font-weight: 700;
+            color: #38bdf8;
+            font-size: 0.95rem;
+            min-width: 20px;
+        }
+
+        .step-text {
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+
+        .step-text a {
+            color: #4dd0e1;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        .step-text a:hover {
+            color: #38bdf8;
+        }
+
+        .step-text code {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 480px) {
+            .coming-soon-card {
+                padding: 0.95rem;
+                margin-bottom: 1rem;
+            }
+
+            .coming-soon-content {
+                gap: 0.8rem;
+            }
+
+            .coming-soon-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .coming-soon-icon i {
+                font-size: 1rem;
+            }
+
+            .coming-soon-label {
+                font-size: 0.65rem;
+            }
+
+            .coming-soon-title {
+                font-size: 0.92rem;
+            }
+
+            .coming-soon-desc {
+                font-size: 0.75rem;
+            }
+
+            .coming-soon-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .instructions-step {
+                gap: 0.6rem;
+                padding: 0.7rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .step-text {
+                font-size: 0.8rem;
+            }
+
+            .modal-body p {
+                font-size: 0.8rem !important;
+                margin-bottom: 0.8rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .modal-body code {
+                font-size: 0.75rem !important;
+            }
+        }
     </style>
 </head>
 
@@ -232,19 +555,22 @@
                         to Be Noted</h5>
                 </div>
                 <div class="modal-body">
-                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #34d399;">
-                        Updated with JEE Advanced 2025 provisional ans keys.
-                    </p>
-                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ced334;">
-                        STATS page is now live, check out score distribution, question-wise analysis and more - <a
-                            href="/stats.html" class="text-primary" style="text-decoration: underline;">Click Here</a>
-                    </p>
-                    <!--<p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ced334;">
-                        If you have response sheet PDF, <a href="/url-extractor.html" class="text-primary" style="text-decoration: underline;">Click Here</a> to extract your response sheet URL.
-                    </p>
-                    <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #ced334;">
-                        Predict your percentile (based on approx 1.7k unique scores per shift) - <a href="/percentile-predictor.html" class="text-primary" style="text-decoration: underline;">Click Here</a>
-                    </p>-->
+                    <div class="coming-soon-card">
+                        <div class="coming-soon-content">
+                            <div class="coming-soon-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="coming-soon-text">
+                                <span class="coming-soon-label">Coming Soon</span>
+                                <p class="coming-soon-title">JEE Main 2026 Marks Calculator</p>
+                                <p class="coming-soon-desc">Available at <span class="coming-soon-highlight">scorepilot.in</span></p>
+                                <a href="https://scorepilot.in" target="_blank" rel="noopener noreferrer" class="coming-soon-btn">
+                                    Visit ScorePilot.in <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <p style="margin-bottom: 1rem;">
                         <span style="font-weight: bold;">1.</span> Log in to the <a href="https://cportal.jeeadv.ac.in/"
                             target="_blank" rel="noopener noreferrer"><b>Candidate Portal</b></a> to get the URLs of
@@ -503,7 +829,7 @@
         </div>
     </div>
     <script src="anskey.js"></script>
-    <script src="script4.js"></script>
+    <script src="script4-main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         const urlMaskOverlay = document.getElementById('urlMaskOverlay');
